@@ -1,0 +1,28 @@
+<!-- your_app/templates/filter_books.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Filter Books</title>
+</head>
+<body>
+    <h1>Filter Books</h1>
+    <form method="post" action="{% url 'index' %}">
+        {% csrf_token %}
+        <div>
+            <label for="id_category">Category:</label>
+            {{ form.category }}
+        </div>
+        <div>
+            <label for="id_author">Author:</label>
+            {{ form.author }}
+        </div>
+        <div>
+            <label for="id_publisher">Publisher:</label>
+            {{ form.publisher }}
+        </div>
+        <button type="submit">Filter</button>
+    </form>
+</body>
+</html>
