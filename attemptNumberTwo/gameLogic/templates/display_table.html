@@ -1,0 +1,57 @@
+<!-- display_table.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display Table Data</title>
+    <style>
+        /* Basic styling for the table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Subscription Plans</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Monthly Price (column 1)</th>
+            <th>Monthly Price (column 2)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in data %}
+        <tr>
+            <td>{{ row.name }}</td>
+            <td>{{ row.monthly_price_cents|default:"N/A" }}</td>
+            <td>{{ row.monthly_price_yearly_subscription_cents|default:"N/A" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No data available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>

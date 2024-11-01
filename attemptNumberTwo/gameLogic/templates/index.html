@@ -1,28 +1,54 @@
-<!-- your_app/templates/filter_books.html -->
+<!-- select_teams.html -->
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Filter Books</title>
+    <title>Select Teams</title>
+    <style>
+        /* Styling for team options */
+        .team-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            display: inline-block;
+            width: 150px;
+            text-align: center;
+        }
+        .team-logo {
+            width: 100px;
+            height: auto;
+        }
+        .team-checkbox {
+            display: none;
+        }
+        .team-label {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        .team-checkbox:checked + .team-label {
+            background-color: #28a745;
+        }
+    </style>
 </head>
 <body>
-    <h1>Filter Books</h1>
-    <form method="post" action="{% url 'index' %}">
+    <h1>Select Teams</h1>
+    <form method="post">
         {% csrf_token %}
-        <div>
-            <label for="id_category">Category:</label>
-            {{ form.category }}
+        <div class="teams-container">
+            {% for club in form.clubs %}
+                <div class="team-card">
+                    <div>
+                        <label for="club-{{ club.id }}" class="club-label">{{ club }}</label>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-        <div>
-            <label for="id_author">Author:</label>
-            {{ form.author }}
-        </div>
-        <div>
-            <label for="id_publisher">Publisher:</label>
-            {{ form.publisher }}
-        </div>
-        <button type="submit">Filter</button>
+        <button type="submit">Submit</button>
     </form>
 </body>
 </html>

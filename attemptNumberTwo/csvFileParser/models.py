@@ -10,7 +10,7 @@ class game(models.Model):
 class streaming_package(models.Model):
     name = models.CharField(max_length=100)
     monthly_price_cents = models.IntegerField(null=True)
-    monthly_price_yearly_subscription_cents = models.IntegerField(null=True)
+    monthly_price_yearly_subscription_in_cents = models.IntegerField(null=True)
 
 
 class streaming_offer(models.Model):
@@ -18,3 +18,14 @@ class streaming_offer(models.Model):
     streaming_package_id = models.ForeignKey(streaming_package, on_delete=models.CASCADE)
     live    = models.BooleanField()
     highlights = models.BooleanField()
+
+class clubs(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name  # This will be displayed in the ModelChoiceField
+class lieges(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name  # This will be displayed in the ModelChoiceField

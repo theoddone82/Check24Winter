@@ -1,8 +1,15 @@
 
 from django import forms
-from csvFileParser.models import game, streaming_package, streaming_offer
+from csvFileParser.models import game, streaming_package, streaming_offer, clubs, lieges
 
 class BookFilterForm(forms.Form):
-    category = forms.ModelChoiceField(queryset=game.objects.all(), required=True, label="Category")
-    author = forms.ModelChoiceField(queryset=streaming_offer.objects.all(), required=True, label="Author")
-    publisher = forms.ModelChoiceField(queryset=streaming_package.objects.all(), required=True, label="Publisher")
+    clubs = forms.ModelChoiceField(
+        queryset=clubs.objects.all(),  # Or apply any filters if needed
+        required=False,
+        empty_label="Select a Category..."  # This sets the placeholder
+    )    
+    lieges = forms.ModelChoiceField(
+        queryset=lieges.objects.all(),  # Or apply any filters if needed
+        required=False,
+        empty_label="Select a liege..."  # This sets the placeholder
+    )    
