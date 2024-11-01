@@ -79,8 +79,12 @@ WSGI_APPLICATION = 'attemptNumberTwo.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'winter',        # Database name
+        'USER': 'postgres',        # Database user
+        'PASSWORD': 'pwd',    # User's password
+        'HOST': 'localhost',            # Localhost, or IP address if remote
+        'PORT': '5432',                 # Default PostgreSQL port
     }
 }
 

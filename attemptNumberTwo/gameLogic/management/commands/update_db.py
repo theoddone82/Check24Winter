@@ -9,8 +9,8 @@ class Command(BaseCommand):
         # Fetch distinct category values from Book
         games = game.objects.values_list('team_home', flat=True).distinct()
 
-        for game in games:
+        for g in games:
             # Create UniqueCategory records if they don't exist
-            clubs.objects.get_or_create(name=game)
+            clubs.objects.get_or_create(name=g)
         
         self.stdout.write(self.style.SUCCESS('UniqueCategory table populated with distinct categories!'))

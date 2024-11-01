@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Display Table Data</title>
+    <title>Subscription Plans</title>
     <style>
         /* Basic styling for the table */
         table {
@@ -20,6 +20,7 @@
         }
         th {
             background-color: #f2f2f2;
+            text-align: left;
         }
         tr:hover {
             background-color: #f9f9f9;
@@ -31,26 +32,36 @@
 <h1>Subscription Plans</h1>
 
 <table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Monthly Price (column 1)</th>
-            <th>Monthly Price (column 2)</th>
-        </tr>
-    </thead>
-    <tbody>
+    <tr>
+        <th>Name</th>
         {% for row in data %}
-        <tr>
             <td>{{ row.name }}</td>
-            <td>{{ row.monthly_price_cents|default:"N/A" }}</td>
-            <td>{{ row.monthly_price_yearly_subscription_cents|default:"N/A" }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="4">No data available.</td>
-        </tr>
         {% endfor %}
-    </tbody>
+    </tr>
+    <tr>
+        <th>Monthly Price</th>
+        {% for row in data %}
+            <td>
+                {% if row.monthly_price_cents == 0 %}
+                    Free
+                {% else %}
+                    {{ row.monthly_price_cents|default:"---" }}
+                {% endif %}
+            </td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <th>Yearly Price</th>
+        {% for row in data %}
+            <td>
+                {% if row.monthly_price_yearly_subscription_in_cents == 0 %}
+                    Free
+                {% else %}
+                    {{ row.monthly_price_yearly_subscription_in_cents|default:"---" }}
+                {% endif %}
+            </td>
+        {% endfor %}
+    </tr>
 </table>
 
 </body>

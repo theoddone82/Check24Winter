@@ -26,7 +26,7 @@ def index(request):
         # for res in list(set(result)):
         packages = streaming_package.objects.filter(id__in=result)
         for pak in packages:
-            print(pak.monthly_price_yearly_subscription_in_cents)
+            print(pak.monthly_price_cents)
         return render(request, 'display_table.html', {'data': packages})
     
     else:
