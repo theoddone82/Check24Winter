@@ -7,16 +7,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Selection</title>
     <style>
-        /* Optional styling to hide checkboxes */
+        /* Container for the club options */
+        .club-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Hide the actual checkbox */
+        .club-checkbox {
+            display: none;
+        }
+
+        /* Style the label as a pill/button */
+        .club-label {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        /* Trikot (jersey) icon styling */
+        .club-icon {
+            font-size: 1.2em;
+            margin-right: 8px;
+            color: #e53935; /* Red color for trikot icon */
+        }
+
+        /* Style for checked state */
+        .club-checkbox:checked + .club-label {
+            background-color: #d1e7ff;
+            border-color: #007bff;
+            color: #007bff;
+        }
+
+        /* Change icon color in checked state */
+        .club-checkbox:checked + .club-label .club-icon {
+            color: #007bff;
+        }
+
+        /* Hidden class for additional options */
         .hidden {
             display: none;
         }
     </style>
     <script>
         function showMoreOptions() {
-            // Get all checkboxes with the class "extra-club"
+            // Reveal all elements with the class "extra-club"
             var extraOptions = document.querySelectorAll(".extra-club");
-            // Make each extra option visible
             extraOptions.forEach(function(option) {
                 option.classList.remove("hidden");
             });
@@ -32,11 +76,15 @@
 <form method="post" action="{% url 'streaming_table' %}">
     {% csrf_token %}
 
-    <!-- Displaying only the first 10 checkboxes initially -->
-    <div>
+    <!-- Container for club options with only the first 10 visible initially -->
+    <div class="club-container">
         {% for club in form.clubs %}
             <div class="{% if forloop.counter > 10 %}hidden extra-club{% endif %}">
-                {{ club }}
+                <input type="checkbox" class="club-checkbox" id="club-{{ forloop.counter }}" name="clubs" value="{{ club.data.value }}">
+                <label class="club-label" for="club-{{ forloop.counter }}">
+                    <span class="club-icon">👕</span> <!-- Trikot icon (replace with an actual icon if desired) -->
+                    {{ club }}
+                </label>
             </div>
         {% endfor %}
     </div>

@@ -56,6 +56,10 @@ def streaming_table(request):
         streaming_packages = []
         test={}
         selectedClubs = request.POST.getlist('clubs')
+
+        if selectedClubs == []:
+            return redirect(reverse('index'))
+        print(selectedClubs)
         lieges = set()
         for name in clubs.objects.filter(id__in=selectedClubs):
             games = game.objects.filter(Q(team_home=name) | Q(team_away=name))
