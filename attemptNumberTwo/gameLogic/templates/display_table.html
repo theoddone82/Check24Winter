@@ -2,6 +2,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,56 +14,82 @@
             border-collapse: collapse;
             margin-top: 20px;
         }
-        th, td {
+
+        th,
+        td {
             padding: 10px;
             text-align: left;
             border: 1px solid #ddd;
         }
+
         th {
             background-color: #f2f2f2;
             text-align: left;
         }
+
         tr:hover {
             background-color: #f9f9f9;
         }
     </style>
 </head>
+
 <body>
 
-<h1>Subscription Plans</h1>
+    <h1>Subscription Plans</h1>
 
-<table>
-    <tr>
-        <th>Name</th>
-        {% for row in data %}
-            <td>{{ row.name }}</td>
+    <table>
+        <tr>
+            <th>Name</th>
+            {% for row in data %}
+            <td colspan="2">{{ row.name }}</td>
+            {% endfor %}
+        </tr>
+        {% for lieg in lieges %}
+        <tr>
+            <th>{{lieg}}</th>
+            {% for row in offers_live %}
+            <td colspan="1">
+                {% if row.live  %}
+                Free
+                {% else %}
+                fuck
+                {% endif %}
+                {{row.live}}
+            <td colspan="1">
+                {{row}}
+            </td>
+            </td>
+            {% endfor %}
+
+        </tr>
+
         {% endfor %}
-    </tr>
-    <tr>
-        <th>Monthly Price</th>
-        {% for row in data %}
-            <td>
+        <tr>
+            <th>Monthly Price</th>
+            {% for row in data %}
+            <td colspan="2">
                 {% if row.monthly_price_cents == 0 %}
-                    Free
+                Free
                 {% else %}
-                    {{ row.monthly_price_cents|default:"---" }}
+                {{ row.monthly_price_cents|default:"---" }}
                 {% endif %}
             </td>
-        {% endfor %}
-    </tr>
-    <tr>
-        <th>Yearly Price</th>
-        {% for row in data %}
-            <td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <th>Yearly Price</th>
+            {% for row in data %}
+            <td colspan="2">
                 {% if row.monthly_price_yearly_subscription_in_cents == 0 %}
-                    Free
+                Free
                 {% else %}
-                    {{ row.monthly_price_yearly_subscription_in_cents|default:"---" }}
+                {{ row.monthly_price_yearly_subscription_in_cents|default:"---" }}
                 {% endif %}
             </td>
-        {% endfor %}
-    </tr>
-</table>
+            {% endfor %}
+        </tr>
+    </table>
 
 </body>
+
 </html>
