@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Selection</title>
     <style>
-        /* Your existing CSS code remains unchanged */
         /* Overall styling */
         body {
             font-family: Arial, sans-serif;
@@ -25,8 +24,8 @@
             margin-bottom: 20px;
         }
 
-        /* Container for the club options */
-        .club-container {
+        /* Container for the options */
+        .option-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
@@ -36,12 +35,12 @@
         }
 
         /* Hide the actual checkbox */
-        .club-checkbox {
+        .option-checkbox {
             display: none;
         }
 
         /* Style the label as a pill/button */
-        .club-label {
+        .option-label {
             display: flex;
             align-items: center;
             padding: 10px 16px;
@@ -55,15 +54,15 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        /* Trikot (jersey) icon styling */
-        .club-icon {
+        /* Icon styling */
+        .option-icon {
             font-size: 1.2em;
             margin-right: 8px;
             color: #0070c9;
         }
 
         /* Style for checked state */
-        .club-checkbox:checked + .club-label {
+        .option-checkbox:checked + .option-label {
             background-color: #e3f2fd;
             border-color: #0070c9;
             color: #0070c9;
@@ -71,7 +70,7 @@
         }
 
         /* Change icon color in checked state */
-        .club-checkbox:checked + .club-label .club-icon {
+        .option-checkbox:checked + .option-label .option-icon {
             color: #0070c9;
         }
 
@@ -80,10 +79,8 @@
             display: none;
         }
 
-        /* Show More and Submit Buttons */
-        #showMoreBtn-clubs,
-        #showMoreBtn-lieges,
-        button[type="submit"] {
+        /* Buttons */
+        .button {
             background-color: #0070c9;
             color: #fff;
             border: none;
@@ -93,11 +90,10 @@
             cursor: pointer;
             transition: background-color 0.3s, box-shadow 0.3s;
             margin-top: 20px;
+            margin-right: 10px;
         }
 
-        #showMoreBtn-clubs:hover,
-        #showMoreBtn-lieges:hover,
-        button[type="submit"]:hover {
+        .button:hover {
             background-color: #005bb5;
             box-shadow: 0 2px 8px rgba(0, 91, 181, 0.3);
         }
@@ -110,14 +106,23 @@
     </style>
     <script>
         function showMoreOptions(section) {
-            var extraOptions = document.querySelectorAll("." + section + " .extra-club.hidden");
+            var extraOptions = document.querySelectorAll("." + section + " .extra-option.hidden");
             for (var i = 0; i < 10 && i < extraOptions.length; i++) {
                 extraOptions[i].classList.remove("hidden");
             }
             // Check if there are any more hidden options
-            if (document.querySelectorAll("." + section + " .extra-club.hidden").length === 0) {
+            if (document.querySelectorAll("." + section + " .extra-option.hidden").length === 0) {
                 document.getElementById("showMoreBtn-" + section).style.display = "none";
             }
+        }
+
+        function selectAllOptions(section, selectAll) {
+            var checkboxes = document.querySelectorAll("." + section + " .option-checkbox");
+            checkboxes.forEach(function (checkbox) {
+                if (!checkbox.disabled) {
+                    checkbox.checked = selectAll;
+                }
+            });
         }
     </script>
 </head>
@@ -129,40 +134,44 @@
 
         <!-- Clubs Section -->
         <h1>Select Clubs</h1>
-        <div class="club-container clubs">
+        <div class="option-container clubs">
             {% for club in form.clubs %}
-            <div class="{% if forloop.counter > 10 %}hidden extra-club{% endif %}">
-                <input type="checkbox" class="club-checkbox" id="club-{{ forloop.counter }}" name="clubs"
+            <div class="{% if forloop.counter > 10 %}hidden extra-option{% endif %}">
+                <input type="checkbox" class="option-checkbox" id="club-{{ forloop.counter }}" name="clubs"
                     value="{{ club.data.value }}">
-                <label class="club-label" for="club-{{ forloop.counter }}">
-                    <span class="club-icon">👕</span>
+                <label class="option-label" for="club-{{ forloop.counter }}">
+                    <span class="option-icon">👕</span>
                     {{ club }}
                 </label>
             </div>
             {% endfor %}
         </div>
-        <!-- Show More Button for Clubs -->
-        <button type="button" id="showMoreBtn-clubs" onclick="showMoreOptions('clubs')">Show More Clubs</button>
+        <!-- Buttons for Clubs -->
+        <button type="button" class="button" onclick="selectAllOptions('clubs', true)">Select All Clubs</button>
+        <button type="button" class="button" onclick="selectAllOptions('clubs', false)">Deselect All Clubs</button>
+        <button type="button" class="button" id="showMoreBtn-clubs" onclick="showMoreOptions('clubs')">Show More Clubs</button>
 
         <!-- Leagues Section -->
         <h1>Select Leagues</h1>
-        <div class="club-container lieges">
+        <div class="option-container lieges">
             {% for league in form.lieges %}
-            <div class="{% if forloop.counter > 10 %}hidden extra-club{% endif %}">
-                <input type="checkbox" class="club-checkbox" id="liege-{{ forloop.counter }}" name="lieges"
+            <div class="{% if forloop.counter > 10 %}hidden extra-option{% endif %}">
+                <input type="checkbox" class="option-checkbox" id="liege-{{ forloop.counter }}" name="lieges"
                     value="{{ league.data.value }}">
-                <label class="club-label" for="liege-{{ forloop.counter }}">
-                    <span class="club-icon">🏆</span>
+                <label class="option-label" for="liege-{{ forloop.counter }}">
+                    <span class="option-icon">🏆</span>
                     {{ league }}
                 </label>
             </div>
             {% endfor %}
         </div>
-        <!-- Show More Button for Leagues -->
-        <button type="button" id="showMoreBtn-lieges" onclick="showMoreOptions('lieges')">Show More Leagues</button>
+        <!-- Buttons for Leagues -->
+        <button type="button" class="button" onclick="selectAllOptions('lieges', true)">Select All Leagues</button>
+        <button type="button" class="button" onclick="selectAllOptions('lieges', false)">Deselect All Leagues</button>
+        <button type="button" class="button" id="showMoreBtn-lieges" onclick="showMoreOptions('lieges')">Show More Leagues</button>
 
         <!-- Submit Button -->
-        <button type="submit">Submit</button>
+        <button type="submit" class="button">Submit</button>
     </form>
 
 </body>
