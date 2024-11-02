@@ -21,6 +21,7 @@ class streaming_offer(models.Model):
 
 class clubs(models.Model):
     name = models.CharField(max_length=100)
+    score = models.IntegerField(null=True)
 
     def __str__(self):
         return self.name  # This will be displayed in the ModelChoiceField

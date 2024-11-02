@@ -5,143 +5,274 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- Responsive viewport -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Streaming Packages Comparison</title>
+    <!-- Bootstrap CSS -->
+    <!-- Latest Bootstrap 5 version -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Add this in the <head> section of your HTML -->
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-pY1zVjNnU4l6p1zxVQxFlIB9o4v0OKxMKkKdV9gvgdtf9gEJ8RG8/pS05BLo4B7N/dK7KgfFhc6Xd2YW4dN7vA=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+    />
+
+    <!-- Custom CSS for minimal adjustments -->
     <style>
-        /* Basic styling for the table */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            text-align: center;
-        }
-        
-        th,
-        td {
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
-        
-        th {
+        body {
             background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* CHECK24 Color Variables */
+        :root {
+            --check24-blue: #005aa0;
+            --check24-light-blue: #e9f4fb;
+            --check24-gray: #f8f9fa;
+        }
+
+        /* Header Section */
+        .title-section {
+            background-color: var(--check24-blue);
+            color: #fff;
+            padding: 20px 0;
+        }
+
+        .title-section h2 {
+            font-size: 2rem;
             font-weight: bold;
+            margin: 0;
         }
-        
-        .package-logo {
-            width: 50px;
-            height: auto;
+
+        .title-icons i {
+            font-size: 1.5rem;
+            margin: 0 10px;
+            cursor: pointer;
+            color: #fff;
         }
-        
-        .live, .highlight {
-            font-size: 0.9em;
-            color: #888;
-            display: block;
+
+        /* Buttons */
+        .btn-check24 {
+            background-color: #fff;
+            color: var(--check24-blue);
+            border: 1px solid var(--check24-blue);
+            font-weight: bold;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 0.25rem;
+        }
+
+        .btn-check24:hover {
+            background-color: var(--check24-blue);
+            color: #fff;
+        }
+
+        /* Table Styling */
+        .comparison-table {
+            background-color: #fff;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            vertical-align: middle !important;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+        }
+
+        .comparison-table thead th {
+            background-color: var(--check24-light-blue);
+            font-weight: bold;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .comparison-table tbody th {
+            background-color: var(--check24-gray);
+            text-align: left;
+            font-weight: normal;
+            position: sticky;
+            left: 0;
+            z-index: 1;
+        }
+
+        .comparison-table img {
+            max-width: 60px;
             margin-bottom: 5px;
         }
 
-        .icon {
-            font-size: 1.2em;
-        }
-
         .icon-yes {
-            color: #4CAF50; /* Green check */
+            color: #28a745;
+            font-size: 1.5rem;
         }
 
         .icon-no {
-            color: #F44336; /* Red cross */
+            color: #dc3545;
+            font-size: 1.5rem;
         }
 
-        /* Styling for headers and separators */
-        .package-header {
-            padding-top: 20px;
-            border-top: 3px solid #000;
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .comparison-table th,
+            .comparison-table td {
+                padding: 10px;
+            }
+
+            .comparison-table img {
+                max-width: 50px;
+            }
+
+            .title-section h2 {
+                font-size: 1.75rem;
+            }
+
+            .title-icons i {
+                font-size: 1.3rem;
+            }
         }
-        
-        .info {
-            font-size: 0.8em;
-            color: #888;
-            text-align: center;
-            margin-top: 5px;
+
+        @media (max-width: 768px) {
+            .title-section h2 {
+                font-size: 1.5rem;
+            }
+
+            .btn-check24 {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+
+            .comparison-table img {
+                max-width: 40px;
+            }
         }
     </style>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>Streaming Packages Comparison</title>
 </head>
 
 <body>
 
-<h1>Subscription Plans Comparison</h1>
+    <!-- Title Section -->
+    <header class="title-section text-center">
+        <div class="container">
+            <h2>Paketvergleich</h2>
+            <div class="title-icons mt-2">
+                <i class="fas fa-search me-3"></i>
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <div class="mt-3">
+                <a  href="/" class="btn-check24">Favoriten</a>
+                <button class="btn btn-check24">Filter</button>
+                <button class="btn btn-check24">Sortierung</button>
+            </div>
+        </div>
+    </header>
 
-{% load custom_filters %}
+    <main class="container my-5">
+        <h1 class="text-center mb-4">Subscription Plans Comparison</h1>
 
-<table>
-    <!-- Header Row with Package Names and Logos -->
-    <tr>
-        <th>League</th>
-        {% for package in packages %}
-            <th colspan="2" class="package-header">
-                <img src="{{ package.logo }}" alt="{{ package.name }} logo" class="package-logo"><br>
-                {{ package.name }}
-                <div class="live">Live | Highl.</div>
-            </th>
-        {% endfor %}
-    </tr>
+        {% load custom_filters %}
 
-    <!-- Rows for Each League -->
-    {% for league in leagues %}
-        <tr>
-            <th>{{ league }}</th>
-            {% for package in packages %}
-                {% with av=availability|get_item:package.id %}
-                    {% with league_av=av|get_item:league %}
-                        <!-- Live Availability Cell -->
-                        <td>
-                            {% if league_av and league_av.live %}
-                                <span class="icon icon-yes">&#10004;</span> <!-- Checkmark -->
-                            {% else %}
-                                <span class="icon icon-no">&#10006;</span> <!-- Cross -->
-                            {% endif %}
-                        </td>
+        <div class="table-responsive">
+            <table class="table comparison-table table-hover align-middle text-center rounded">
+                <!-- Header Row with Package Names and Logos -->
+                <thead class="align-middle">
+                    <tr>
+                        <th scope="col">League</th>
+                        {% for package in packages %}
+                            <th scope="col" style="min-width: 200px;" colspan="2">
+                                <!-- <img src="{{ package.logo }}" alt="{{ package.name }} logo" class="img-fluid"><br> -->
+                                 <!-- Example usage --> 
+                                <i class="fab fa-amazon fa-2x"></i>
+                                <br>
+                                {{ package.name }}
+                                <br>
+                                <br>
+                                <div style="color: grey; display: flex; position: absolute; bottom: 5px; left: 5px; font-weight: normal;">live</div>
+                                <div style="color: grey; display: flex; position: absolute; bottom: 5px; right: 5px;  font-weight: normal;">highl.</div>
 
-                        <!-- Highlights Availability Cell -->
-                        <td>
-                            {% if league_av and league_av.highlight %}
-                                <span class="icon icon-yes">&#10004;</span> <!-- Checkmark -->
-                            {% else %}
-                                <span class="icon icon-no">&#10006;</span> <!-- Cross -->
-                            {% endif %}
-                        </td>
-                    {% endwith %}
-                {% endwith %}
-            {% endfor %}
-        </tr>
-    {% endfor %}
+                            </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows for Each League -->
+                    {% for league in leagues %}
+                        <tr>
+                            <th scope="row">{{ league }}</th>
+                            {% for package in packages %}
+                                {% with av=availability|get_item:package.id %}
+                                    {% with league_av=av|get_item:league %}
+                                        <!-- Live Availability Cell -->
+                                        <td>
+                                            {% if league_av and league_av.live %}
+                                                <span class="icon-yes"><i class="fas fa-check-circle"></i></span>
+                                            {% else %}
+                                                <span class="icon-no"><i class="fas fa-times-circle"></i></span>
+                                            {% endif %}
+                                        </td>
 
-    <!-- Optional Price Rows -->
-    <tr>
-        <th>Monthly Price</th>
-        {% for package in packages %}
-            <td colspan="2">
-                {% if package.monthly_price_cents == 0 %}
-                Free
-                {% else %}
-                {{ package.monthly_price_cents|default:"---" }}
-                {% endif %}
-            </td>
-        {% endfor %}
-        </td>
-    </tr>
-    <tr>
-        <th>Yearly Price</th>
-        {% for package in packages %}
-            <td colspan="2">
-                {% if package.monthly_price_yearly_subscription_in_cents == 0 %}
-                Free
-                {% else %}
-                {{ package.monthly_price_yearly_subscription_in_cents|floatformat:2|default:"---" }}
-                {% endif %}
-            </td>
-        {% endfor %}
-    </tr>
-</table>
+                                        <!-- Highlights Availability Cell -->
+                                        <td>
+                                            {% if league_av and league_av.highlight %}
+                                                <span class="icon-yes"><i class="fas fa-check-circle"></i></span>
+                                            {% else %}
+                                                <span class="icon-no"><i class="fas fa-times-circle"></i></span>
+                                            {% endif %}
+                                        </td>
+                                    {% endwith %}
+                                {% endwith %}
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
 
+                    <!-- Optional Price Rows -->
+                    <tr class="table-primary">
+                        <th scope="row">Monthly Price</th>
+                        {% for package in packages %}
+                            <td colspan="2">
+                                {% if package.monthly_price_cents == 0 %}
+                                    <strong>Free</strong>
+                                {% else %}
+                                    <strong>{{ package.monthly_price_cents|floatformat:2|default:"---" }} €</strong>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="table-primary">
+                        <th scope="row">Yearly Price</th>
+                        {% for package in packages %}
+                            <td colspan="2">
+                                {% if package.monthly_price_yearly_subscription_in_cents == 0 %}
+                                    <strong>Free</strong>
+                                {% else %}
+                                    <strong>{{ package.monthly_price_yearly_subscription_in_cents|floatformat:2|default:"---" }} €</strong>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="bg-light py-4">
+        <div class="container text-center">
+            <p class="mb-0">&copy; {{ current_year }} Your Company. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Include Bootstrap JS if necessary -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
