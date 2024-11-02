@@ -1,54 +1,52 @@
-<!-- select_teams.html -->
+<!-- team_selection.html -->
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Select Teams</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Selection</title>
     <style>
-        /* Styling for team options */
-        .team-card {
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin: 10px;
-            border-radius: 5px;
-            display: inline-block;
-            width: 150px;
-            text-align: center;
-        }
-        .team-logo {
-            width: 100px;
-            height: auto;
-        }
-        .team-checkbox {
+        /* Optional styling to hide checkboxes */
+        .hidden {
             display: none;
         }
-        .team-label {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 4px;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-        }
-        .team-checkbox:checked + .team-label {
-            background-color: #28a745;
-        }
     </style>
+    <script>
+        function showMoreOptions() {
+            // Get all checkboxes with the class "extra-club"
+            var extraOptions = document.querySelectorAll(".extra-club");
+            // Make each extra option visible
+            extraOptions.forEach(function(option) {
+                option.classList.remove("hidden");
+            });
+            // Hide the "Show More" button after expanding options
+            document.getElementById("showMoreBtn").style.display = "none";
+        }
+    </script>
 </head>
 <body>
-    <h1>Select Teams</h1>
-    <form method="post">
-        {% csrf_token %}
-        <div class="teams-container">
-            {% for club in form.clubs %}
-                <div class="team-card">
-                    <div>
-                        <label for="club-{{ club.id }}" class="club-label">{{ club }}</label>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-        <button type="submit">Submit</button>
-    </form>
+
+<h1>Select Clubs</h1>
+
+<form method="post" action="{% url 'streaming_table' %}">
+    {% csrf_token %}
+
+    <!-- Displaying only the first 10 checkboxes initially -->
+    <div>
+        {% for club in form.clubs %}
+            <div class="{% if forloop.counter > 10 %}hidden extra-club{% endif %}">
+                {{ club }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Show More Button -->
+    <button type="button" id="showMoreBtn" onclick="showMoreOptions()">Show More</button>
+
+    <!-- Submit Button -->
+    <button type="submit">Submit</button>
+</form>
+
 </body>
 </html>

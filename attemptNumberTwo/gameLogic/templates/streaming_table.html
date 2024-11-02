@@ -1,0 +1,147 @@
+<!-- streaming_table.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streaming Packages Comparison</title>
+    <style>
+        /* Basic styling for the table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        th,
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        
+        .package-logo {
+            width: 50px;
+            height: auto;
+        }
+        
+        .live, .highlight {
+            font-size: 0.9em;
+            color: #888;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .icon {
+            font-size: 1.2em;
+        }
+
+        .icon-yes {
+            color: #4CAF50; /* Green check */
+        }
+
+        .icon-no {
+            color: #F44336; /* Red cross */
+        }
+
+        /* Styling for headers and separators */
+        .package-header {
+            padding-top: 20px;
+            border-top: 3px solid #000;
+        }
+        
+        .info {
+            font-size: 0.8em;
+            color: #888;
+            text-align: center;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Subscription Plans Comparison</h1>
+
+{% load custom_filters %}
+
+<table>
+    <!-- Header Row with Package Names and Logos -->
+    <tr>
+        <th>League</th>
+        {% for package in packages %}
+            <th colspan="2" class="package-header">
+                <img src="{{ package.logo }}" alt="{{ package.name }} logo" class="package-logo"><br>
+                {{ package.name }}
+                <div class="live">Live | Highl.</div>
+            </th>
+        {% endfor %}
+    </tr>
+
+    <!-- Rows for Each League -->
+    {% for league in leagues %}
+        <tr>
+            <th>{{ league }}</th>
+            {% for package in packages %}
+                {% with av=availability|get_item:package.id %}
+                    {% with league_av=av|get_item:league %}
+                        <!-- Live Availability Cell -->
+                        <td>
+                            {% if league_av and league_av.live %}
+                                <span class="icon icon-yes">&#10004;</span> <!-- Checkmark -->
+                            {% else %}
+                                <span class="icon icon-no">&#10006;</span> <!-- Cross -->
+                            {% endif %}
+                        </td>
+
+                        <!-- Highlights Availability Cell -->
+                        <td>
+                            {% if league_av and league_av.highlight %}
+                                <span class="icon icon-yes">&#10004;</span> <!-- Checkmark -->
+                            {% else %}
+                                <span class="icon icon-no">&#10006;</span> <!-- Cross -->
+                            {% endif %}
+                        </td>
+                    {% endwith %}
+                {% endwith %}
+            {% endfor %}
+        </tr>
+    {% endfor %}
+
+    <!-- Optional Price Rows -->
+    <tr>
+        <th>Monthly Price</th>
+        {% for package in packages %}
+            <td colspan="2">
+                {% if package.monthly_price_cents == 0 %}
+                Free
+                {% else %}
+                {{ package.monthly_price_cents|default:"---" }}
+                {% endif %}
+            </td>
+        {% endfor %}
+        </td>
+    </tr>
+    <tr>
+        <th>Yearly Price</th>
+        {% for package in packages %}
+            <td colspan="2">
+                {% if package.monthly_price_yearly_subscription_in_cents == 0 %}
+                Free
+                {% else %}
+                {{ package.monthly_price_yearly_subscription_in_cents|floatformat:2|default:"---" }}
+                {% endif %}
+            </td>
+        {% endfor %}
+    </tr>
+</table>
+
+</body>
+</html>
