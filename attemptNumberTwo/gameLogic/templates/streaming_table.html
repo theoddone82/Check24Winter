@@ -135,7 +135,7 @@
             }
         }
         .extra-row {
-            display: none;
+            /* display: none; */
         }
 
         @media (max-width: 768px) {
@@ -269,7 +269,11 @@
         </div>
     </main>
     <div>{{selected_packages}}</div>
-
+    <br>
+    
+    {% for package in selected_packages2 %}
+    <div>{{package.name}} {{package.monthly_price_yearly_subscription_in_cents}}</div>
+    {% endfor %}
     <!-- Footer Section -->
     <footer class="bg-light py-4">
         <div class="container text-center">

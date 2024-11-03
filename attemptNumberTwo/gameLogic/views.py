@@ -47,9 +47,8 @@ def streaming_table(request):
 
         # Fetch liege names if any are selected
         if selectedLieges:
-            lieges_but_not_db = set(
-                lieges.objects.filter(id__in=selectedLieges).values_list('name', flat=True)
-            )
+            lieges_but_not_db = lieges.objects.filter(id__in=selectedLieges).values_list('name', flat=True).order_by('-score')# it's a set dumbass order doesn't matter.order_by('-score')
+            
         else:
             lieges_but_not_db = set()
 
@@ -161,12 +160,13 @@ def streaming_table(request):
 
             selected_packages.add(best_package)
             remaining_tournaments -= best_coverage
-
+        packages_as_objects = streaming_package.objects.filter(id__in=selected_packages)
         # Build context
         context = {
             'packages': packages,
             'leagues': lieges_but_not_db,
             'availability': availability,
+            'selected_packages2': packages_as_objects,
             'selected_packages': selected_packages,
         }
         print(selected_packages)
