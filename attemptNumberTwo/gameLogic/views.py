@@ -160,7 +160,10 @@ def streaming_table(request):
 
             selected_packages.add(best_package)
             remaining_tournaments -= best_coverage
-        packages_as_objects = streaming_package.objects.filter(id__in=selected_packages)
+        packages_as_objects = streaming_package.objects.filter(id__in=selected_packages).annotate(
+            monthly_price_cents_float=Coalesce(F('monthly_price_cents') / 100.0, Value(0.0)),
+            monthly_price_yearly_subscription_in_cents_float=Coalesce(F('monthly_price_yearly_subscription_in_cents') / 100.0, Value(0.0))
+        )
         # Build context
         context = {
             'packages': packages,
