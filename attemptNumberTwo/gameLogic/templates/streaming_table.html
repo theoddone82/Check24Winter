@@ -137,6 +137,46 @@
         .extra-row {
             /* display: none; */
         }
+        :root {
+            --background-color: #f5f5f5;
+            --text-color: #333;
+            --header-background-color: #005aa0;
+            --header-text-color: #fff;
+            --button-background-color: #fff;
+            --button-text-color: #005aa0;
+            --button-border-color: #005aa0;
+            --table-background-color: #fff;
+            --table-header-background-color: #e9f4fb;
+            --table-row-background-color: #f8f9fa;
+            --icon-yes-color: #28a745;
+            --icon-no-color: #dc3545;
+        }
+        .dark-mode {
+            --background-color: #1e1e1e;
+            --text-color: #f5f5f5;
+            --header-background-color: #333;
+            --header-text-color: #f5f5f5;
+            --button-background-color: #333;
+            --button-text-color: #f5f5f5;
+            --button-border-color: #555;
+            --table-background-color: #2b2b2b;
+            --table-header-background-color: #3c3c3c;
+            --table-row-background-color: #2b2b2b;
+            --icon-yes-color: #66bb6a;
+            --icon-no-color: #ef5350;
+        }
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        /* Header Section */
+        .title-section {
+            background-color: var(--header-background-color);
+            color: var(--header-text-color);
+        }
+
+        /* ... other styles using variables ... */
 
         @media (max-width: 768px) {
             .title-section h2 {
@@ -152,6 +192,57 @@
                 max-width: 40px;
             }
         }
+        /* General dark mode styling */
+        body.dark-mode {
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        /* Dark mode styling for scrollbars */
+        body.dark-mode ::-webkit-scrollbar {
+            height: 10px;
+            width: 10px;
+            background-color: #333333; /* Background of the scrollbar track */
+        }
+
+        body.dark-mode ::-webkit-scrollbar-thumb {
+            background-color: #555555; /* Color of the scrollbar thumb */
+            border-radius: 5px;
+        }
+
+        body.dark-mode ::-webkit-scrollbar-thumb:hover {
+            background-color: #777777; /* Hover color of the scrollbar thumb */
+        }
+
+        body.dark-mode ::-webkit-scrollbar-track {
+            background-color: #222222; /* Color of the scrollbar track */
+        }
+
+        /* Dark mode styling */
+        body.dark-mode {
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        body.dark-mode table {
+            background-color: #1e1e1e; /* Darker background for table */
+            color: #ffffff;
+            border-color: #444444; /* Darker borders */
+        }
+
+        body.dark-mode th,
+        body.dark-mode td {
+            background-color: #2b2b2b; /* Darker background for table cells */
+            color: #ffffff;
+            border: 1px solid #444444; /* Darker border color */
+        }
+
+        /* Optional: Change colors for table header specifically */
+        body.dark-mode thead th {
+            background-color: #333333;
+            color: #ffffff;
+        }
+
     </style>
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -205,10 +296,40 @@
         }
     </style>
 </head>
+    <script>// Dark Mode Toggle
+        document.addEventListener("DOMContentLoaded", function () {
 
+        const toggleDarkModeBtn = document.getElementById('darkModeToggle');
+        const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+        
+        const currentTheme = localStorage.getItem("theme");
+        if (currentTheme == "dark") {
+            document.body.classList.add("dark-mode");
+            toggleDarkModeBtn.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+        } else if (currentTheme == "light") {
+            document.body.classList.remove("dark-mode");
+        } else if (prefersDarkScheme.matches) {
+            document.body.classList.add("dark-mode");
+            toggleDarkModeBtn.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+        }
+        
+        toggleDarkModeBtn.addEventListener("click", function () {
+            console.log("clicked");
+            document.body.classList.toggle("dark-mode");
+            let theme = "light";
+            if (document.body.classList.contains("dark-mode")) {
+                theme = "dark";
+                toggleDarkModeBtn.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+            } else {
+                toggleDarkModeBtn.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+            }
+            localStorage.setItem("theme", theme);
+        });
+        });
+        </script>
 
     <!-- [Your existing body content up to the main container remains unchanged] -->
-
+    <button id="darkModeToggle">Toggle Dark Mode</button>
     <main class="container my-5">
 
         <!-- [Your existing table code remains unchanged] -->
