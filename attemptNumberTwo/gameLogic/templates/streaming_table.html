@@ -113,7 +113,9 @@
             color: #dc3545;
             font-size: 1.5rem;
         }
-
+        .extra-row {
+            display: none;
+        }
         /* Responsive Adjustments */
         @media (max-width: 992px) {
 
@@ -134,9 +136,11 @@
                 font-size: 1.3rem;
             }
         }
-        .extra-row {
-            /* display: none; */
+        body.dark-mode .footer-section {
+            background-color: #333;
+            color: #ffffff;
         }
+        
         :root {
             --background-color: #f5f5f5;
             --text-color: #333;
@@ -164,10 +168,6 @@
             --table-row-background-color: #2b2b2b;
             --icon-yes-color: #66bb6a;
             --icon-no-color: #ef5350;
-        }
-        body {
-            background-color: var(--background-color);
-            color: var(--text-color);
         }
 
         /* Header Section */
@@ -261,7 +261,10 @@
             </div>
             <div class="mt-3">
                 <a href="/" class="btn btn-check24 text-decoration-none">Favoriten</a>
-                <a href="/" class="btn btn-check24 text-decoration-none">Filter</a>
+                <button type="button" class="btn btn-check24" data-bs-toggle="modal" data-bs-target="#filterModal">
+                    Filter
+                </button>
+
                 <a href="#" class="btn btn-check24 text-decoration-none">Sortierung</a>
             </div>
         </div>
@@ -477,7 +480,7 @@
         </div>
     </main>
     <!-- Footer Section -->
-    <footer class="bg-light py-4">
+    <footer class="footer-section py-4">
         <div class="container text-center">
             <p class="mb-0">&copy; {{ current_year }} Your Company. All rights reserved.</p>
         </div>
@@ -487,3 +490,60 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="GET" action="{% url 'streaming_table' %}" class="modal-content">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filter Options</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Price Filter -->
+                <div class="mb-3">
+                    <label class="form-label">Price</label>
+                    <div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="price" value="free" id="priceFree" {% if 'free' in selected_price %}checked{% endif %}>
+                            <label class="form-check-label" for="priceFree">Free</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="price" value="paid" id="pricePaid" {% if 'paid' in selected_price %}checked{% endif %}>
+                            <label class="form-check-label" for="pricePaid">Paid</label>
+                        </div>
+                    </div>
+                </div>
+                <!-- Streaming Providers Filter -->
+                <div class="mb-3">
+                    <label class="form-label">Streaming Providers</label>
+                    {% for provider in all_providers %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="providers" value="{{ provider.id }}" id="provider{{ provider.id }}" {% if provider.id|stringformat:"s" in selected_providers %}checked{% endif %}>
+                        <label class="form-check-label" for="provider{{ provider.id }}">{{ provider.name }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+                <!-- Live / Highlights Filter -->
+                <div class="mb-3">
+                    <label class="form-label">Content Type</label>
+                    <div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="content_type" value="live" id="contentLive" {% if 'live' in selected_content_types %}checked{% endif %}>
+                            <label class="form-check-label" for="contentLive">Live</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="content_type" value="highlights" id="contentHighlights" {% if 'highlights' in selected_content_types %}checked{% endif %}>
+                            <label class="form-check-label" for="contentHighlights">Highlights</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <!-- Add a Reset Button -->
+                <a href="{% url 'streaming_table' %}" class="btn btn-secondary">Reset Filters</a>
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+            </div>
+        </form>
+    </div>
+</div>
