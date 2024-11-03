@@ -9,7 +9,7 @@ class TeamSelectionForm(forms.Form):
     )
 
     lieges = forms.ModelMultipleChoiceField(
-        queryset=lieges.objects.all(),
+        queryset=lieges.objects.all().order_by('-score'),
         # widget=forms.CheckboxSelectMultiple,
         required=False,
     )

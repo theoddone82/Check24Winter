@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'csvFileParser',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -51,8 +52,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',  # This must be the first in the list
 ]
-
+INTERNAL_IPS = [
+    '127.0.0.1',
+    'localhost',
+]
 ROOT_URLCONF = 'attemptNumberTwo.urls'
 
 TEMPLATES = [

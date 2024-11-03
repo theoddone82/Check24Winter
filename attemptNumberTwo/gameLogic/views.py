@@ -38,7 +38,7 @@ def streaming_table(request):
 
         # Check if the context is in the cache
         context = cache.get(cache_key)
-        if context:
+        if context and False:
             print("Serving from cache")
             return render(request, 'streaming_table.html', context)
 
@@ -143,7 +143,7 @@ def streaming_table(request):
                 new_coverage = coverage & remaining_tournaments
                 if not new_coverage:
                     continue
-                cost = package_info[package_id]['monthly_price_cents']
+                cost = package_info[package_id]['monthly_price_yearly_subscription_in_cents']
                 if cost is None:
                     cost = 0  # Assume free
                 if cost == 0:

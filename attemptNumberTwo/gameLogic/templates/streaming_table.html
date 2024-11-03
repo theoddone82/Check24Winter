@@ -135,7 +135,7 @@
             }
         }
         .extra-row {
-            display: none;
+            /* display: none; */
         }
 
         @media (max-width: 768px) {
@@ -295,7 +295,7 @@
                 </thead>
                 <tbody>
                     <!-- Rows for Each League -->
-                    {% for league in leagues|slice:"2:5" %}
+                    {% for league in leagues|slice:":5" %}
                     <tr {% if forloop.counter > 3 %}class="extra-row"{% endif %}>
                         
                         <th scope="row">{{ league }}</th>
