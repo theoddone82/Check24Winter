@@ -43,7 +43,7 @@ def streaming_table(request):
 
         # Check if the context is in the cache
         context = cache.get(cache_key)
-        if context and False:
+        if context:
             print("Serving from cache")
             return render(request, 'streaming_table.html', context)
 
