@@ -23,10 +23,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-q^6^_jc+h#++!++aon_@x7m++potn^cr)imqozq-ypcc8coor-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
+# Base directory of your Django project
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Static files settings
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # Directory where collectstatic will collect static files
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'Check24Winter/static'),  # Replace 'your_app_name' with your actual app name if you have app-specific static files
+]
+
+# Media files settings
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Stores media file
 
 # Application definition
 
@@ -57,6 +71,8 @@ MIDDLEWARE = [
 INTERNAL_IPS = [
     '127.0.0.1',
     'localhost',
+	'188.34.207.22',
+	'*',
 ]
 ROOT_URLCONF = 'attemptNumberTwo.urls'
 
@@ -84,12 +100,8 @@ WSGI_APPLICATION = 'attemptNumberTwo.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'winter',        # Database name
-        'USER': 'postgres',        # Database user
-        'PASSWORD': 'pwd',    # User's password
-        'HOST': 'localhost',            # Localhost, or IP address if remote
-        'PORT': '5432',                 # Default PostgreSQL port
+        'ENGINE': 'django.db.backends.sqlite3',
+	'NAME': os.path.join(BASE_DIR, 'db.sqlite3')
     }
 }
 
@@ -131,9 +143,7 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
-
-STATIC_URL = 'static/'
+# https://docs.djangoproject.com/en/5.1/howto/static-files
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
