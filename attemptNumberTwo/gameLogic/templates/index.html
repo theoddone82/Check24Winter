@@ -291,3 +291,27 @@
 </body>
 
 </html>
+
+<div id="selectedPackagesInfo" style="display: none;">
+    <h3 class="mt-4">Selected Packages</h3>
+    {% for package in selected_packages2 %}
+    <div class="package-card">
+        <h5>{{ package.name }}</h5>
+        <p>
+            <strong>Monthly Price:</strong>
+            {% if package.monthly_price_cents_float %}
+            {{ package.monthly_price_cents_float|floatformat:2 }} €
+            {% else %}
+            N/A
+            {% endif %}
+            <br>
+            <strong>Yearly Price:</strong>
+            {% if package.monthly_price_yearly_subscription_in_cents_float %}
+            {{ package.monthly_price_yearly_subscription_in_cents_float|floatformat:2 }} €
+            {% else %}
+            N/A
+            {% endif %}
+        </p>
+    </div>
+    {% endfor %}
+</div>

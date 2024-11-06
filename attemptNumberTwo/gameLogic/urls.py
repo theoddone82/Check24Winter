@@ -21,7 +21,7 @@ from . import views
 
 urlpatterns = [
     path('index', views.index, name='index'),
-    path('', views.streaming_table, name='streaming_table'),
+    path('matchmaking/', views.streaming_table, name='streaming_table'),
     path('fetch-league-details/<int:league_id>/', views.fetch_league_details, name='fetch_league_details'),
-
+    path('' , views.homepage, name='homepage'),
 ]

@@ -255,12 +255,9 @@
     <header class="title-section text-center">
         <div class="container">
             <h2>Paketvergleich</h2>
-            <div class="title-icons mt-2">
-                <i class="fas fa-search me-3"></i>
-                <i class="fas fa-arrow-left"></i>
-            </div>
+
             <div class="mt-3">
-                <a href="/" class="btn btn-check24 text-decoration-none">Favoriten</a>
+                <a href="/" class="btn btn-check24 text-decoration-none">Homescreen</a>
                 <button type="button" class="btn btn-check24" data-bs-toggle="modal" data-bs-target="#filterModal">
                     Filter
                 </button>
@@ -332,13 +329,13 @@
         </script>
 
     <!-- [Your existing body content up to the main container remains unchanged] -->
-    <button id="darkModeToggle">Toggle Dark Mode</button>
     <main class="container my-5">
 
         <!-- [Your existing table code remains unchanged] -->
 
         <!-- Add the button to show/hide selected packages -->
         <button id="toggleSelectedPackagesBtn" class="btn btn-primary mt-4">Show Selected Packages</button>
+        <button class="btn btn-primary mt-4 float-end" id="darkModeToggle">Toggle Dark Mode</button>
 
         <!-- Div to display selected packages information -->
         <div id="selectedPackagesInfo" style="display: none;">
@@ -349,16 +346,16 @@
                 <p>
                     <strong>Monthly Price:</strong>
                     {% if package.monthly_price_cents_float %}
-                        {{ package.monthly_price_cents_float|floatformat:2 }} €
+                    {{ package.monthly_price_cents_float|floatformat:2 }} €
                     {% else %}
-                        N/A
+                    N/A
                     {% endif %}
                     <br>
                     <strong>Yearly Price:</strong>
                     {% if package.monthly_price_yearly_subscription_in_cents_float %}
-                        {{ package.monthly_price_yearly_subscription_in_cents_float|floatformat:2 }} €
+                    {{ package.monthly_price_yearly_subscription_in_cents_float|floatformat:2 }} €
                     {% else %}
-                        N/A
+                    N/A
                     {% endif %}
                 </p>
             </div>
@@ -374,7 +371,7 @@
 
     <!-- Add the JavaScript to handle the button click -->
     <script>
-        document.getElementById('toggleSelectedPackagesBtn').addEventListener('click', function() {
+        document.getElementById('toggleSelectedPackagesBtn').addEventListener('click', function () {
             var infoDiv = document.getElementById('selectedPackagesInfo');
             if (infoDiv.style.display === 'none' || infoDiv.style.display === '') {
                 infoDiv.style.display = 'block';

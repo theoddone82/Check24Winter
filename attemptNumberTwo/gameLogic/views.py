@@ -265,3 +265,6 @@ def index(request):
         form = footballTeamForm.TeamSelectionForm()
         return render(request, 'index.html', {'form': form})
     
+
+def homepage(request):
+    return render(request, 'homepage.html')
