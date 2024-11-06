@@ -2,258 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Homepage</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    /* Custom button styling */
-    .button {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 300px;
-      background-color: #f8f9fa;
-      color: #333;
-      text-decoration: none;
-      border-radius: 15px;
-      border: 2px solid #ddd;
-      transition: transform 0.3s ease, background-color 0.3s ease;
-    }
-
-    .button:hover {
-      background-color: #e2e6ea;
-      transform: scale(1.05);
-    }
-
-    .button svg {
-      width: 100px;
-      height: 100px;
-      margin-bottom: 10px;
-    }
-
-    .button span {
-      font-size: 1.25rem;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-
-<div class="container text-center mt-5">
-  <h1>Welcome to the Dashboard</h1>
-  <div class="row mt-4">
-
-    <!-- Functionality Button -->
-    <div class="col-12 col-md-6 mb-4">
-      <a href="/matchmaking/" class="button">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-graph-up-arrow" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5"/>
-        </svg>
-        <span>Functionality</span>
-      </a>
-    </div>
-
-    <!-- Performance Metrics Button -->
-    <div class="col-12 col-md-6 mb-4">
-      <a href="/performance/" class="button">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-graph-up-arrow" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5"/>
-        </svg>
-        <span>Performance Metrics</span>
-      </a>
-    </div>
-
-  </div>
-</div>
-
-<!-- Bootstrap JS (for optional interactive components) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Homepage</title>
-  <!-- Responsive viewport -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Bootstrap CSS -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    rel="stylesheet">
-  <!-- Font Awesome for icons -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    integrity="sha512-pY1zVjNnU4l6p1zxVQxFlIB9o4v0OKxMKkKdV9gvgdtf9gEJ8RG8/pS05BLo4B7N/dK7KgfFhc6Xd2YW4dN7vA=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer" />
-  <!-- Custom CSS -->
-  <style>
-    :root {
-      --primary-color: #005aa0;
-      --secondary-color: #f8f9fa;
-      --text-color: #333;
-      --background-color: #ffffff;
-      --button-bg-color: #005aa0;
-      --button-text-color: #ffffff;
-    }
-
-    body {
-      background-color: var(--background-color);
-      color: var(--text-color);
-    }
-
-    .header-section {
-      background-color: var(--primary-color);
-      color: var(--button-text-color);
-      padding: 20px 0;
-    }
-
-    .header-section h1 {
-      font-size: 2.5rem;
-      margin: 0;
-    }
-
-    .button {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 200px;
-      background-color: var(--secondary-color);
-      color: var(--text-color);
-      text-decoration: none;
-      border-radius: 15px;
-      border: 2px solid #ddd;
-      transition: transform 0.3s ease, background-color 0.3s ease;
-    }
-
-    .button:hover {
-      background-color: #e2e6ea;
-      transform: translateY(-5px);
-    }
-
-    .button i {
-      font-size: 3rem;
-      margin-bottom: 15px;
-    }
-
-    .button span {
-      font-size: 1.25rem;
-      font-weight: bold;
-    }
-
-    /* Dark Mode Styles */
-    .dark-mode {
-      --primary-color: #333333;
-      --secondary-color: #2b2b2b;
-      --text-color: #f5f5f5;
-      --background-color: #121212;
-      --button-bg-color: #444444;
-      --button-text-color: #f5f5f5;
-    }
-
-    /* Dark mode button */
-    .dark-mode-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background-color: var(--button-bg-color);
-      color: var(--button-text-color);
-      border: none;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-
-<!-- Dark Mode Toggle Button -->
-<button class="btn btn-primary mt-4 position-absolute end-0" id="darkModeToggle">Toggle Dark Mode</button>
-<i class="fas fa-moon"></i>
-</button>
-
-<!-- Header Section -->
-<header class="header-section text-center">
-  <div class="container">
-    <h1>Welcome to the Dashboard</h1>
-  </div>
-</header>
-
-<!-- Main Content -->
-<div class="container text-center mt-5">
-  <div class="row mt-4 g-4">
-    <!-- Functionality Button -->
-    <div class="col-12 col-md-6">
-      <a href="/matchmaking/" class="button">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-graph-up-arrow" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5"/>
-        </svg>
-        <span>Functionality</span>
-      </a>
-    </div>
-
-    <!-- Performance Metrics Button -->
-    <div class="col-12 col-md-6">
-      <a href="/performance/" class="button">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-graph-up-arrow" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5"/>
-        </svg>
-        <span>Performance Metrics</span>
-      </a>
-    </div>
-  </div>
-</div>
-
-<!-- Bootstrap JS -->
-<script
-  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
-</script>
-
-<!-- Dark Mode Script -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const toggleDarkModeBtn = document.getElementById('darkModeToggle');
-    const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
-
-    const currentTheme = localStorage.getItem("theme");
-    if (currentTheme == "dark") {
-      document.body.classList.add("dark-mode");
-      toggleDarkModeBtn.innerHTML = '<i class="fas fa-sun"></i>';
-    } else if (currentTheme == "light") {
-      document.body.classList.remove("dark-mode");
-      toggleDarkModeBtn.innerHTML = '<i class="fas fa-moon"></i>';
-    } else if (prefersDarkScheme.matches) {
-      document.body.classList.add("dark-mode");
-      toggleDarkModeBtn.innerHTML = '<i class="fas fa-sun"></i>';
-    }
-
-    toggleDarkModeBtn.addEventListener("click", function () {
-      document.body.classList.toggle("dark-mode");
-      let theme = "light";
-      if (document.body.classList.contains("dark-mode")) {
-        theme = "dark";
-        toggleDarkModeBtn.innerHTML = '<i class="fas fa-sun"></i>';
-      } else {
-        toggleDarkModeBtn.innerHTML = '<i class="fas fa-moon"></i>';
-      }
-      localStorage.setItem("theme", theme);
-    });
-  });
-</script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
   <title>Dashboard</title>
   <!-- Responsive viewport -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -364,8 +112,8 @@
       right: 20px;
       background-color: transparent;
       color: var(--text-color);
-      border: none;
-      font-size: 2rem;
+      border: white;
+      font-size: 20 px;
       cursor: pointer;
     }
 
@@ -378,18 +126,18 @@
 <body>
 
   <!-- Dark Mode Toggle Button -->
-  <button class="dark-mode-toggle" id="darkModeToggle">
-    <i class="fas fa-moon"></i>
-  </button>
-
+   <div >
+    <button class="btn btn-primary mt-4 position-absolute end-0" id="darkModeToggle">Toggle Dark Mode <br> <p style="font-size: small;">i mean why would you ever need to but it's possible ig</p></button>
+  </div>
   <!-- Main Content -->
   <div class="button-container">
     <div class="button-row">
       <!-- First Button -->
       <a href="/matchmaking/" class="button">
         <!-- SVG Icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-graph-up-arrow" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+          <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
+          <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
         </svg>
         <span>Matchmaking</span>
       </a>
@@ -412,37 +160,48 @@
 
   <!-- Font Awesome for Icons -->
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
-  <!-- Dark Mode Script -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const toggleDarkModeBtn = document.getElementById('darkModeToggle');
-      const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+        const toggleDarkModeBtn = document.getElementById('darkModeToggle');
+        const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
 
-      const currentTheme = localStorage.getItem("theme");
-      if (currentTheme == "dark") {
-        document.body.classList.add("dark-mode");
-        toggleDarkModeBtn.innerHTML = '<i class="fas fa-sun"></i>';
-      } else if (currentTheme == "light") {
-        document.body.classList.remove("dark-mode");
-        toggleDarkModeBtn.innerHTML = '<i class="fas fa-moon"></i>';
-      } else if (prefersDarkScheme.matches) {
-        document.body.classList.add("dark-mode");
-        toggleDarkModeBtn.innerHTML = '<i class="fas fa-sun"></i>';
-      }
-
-      toggleDarkModeBtn.addEventListener("click", function () {
-        document.body.classList.toggle("dark-mode");
-        let theme = "light";
-        if (document.body.classList.contains("dark-mode")) {
-          theme = "dark";
-          toggleDarkModeBtn.innerHTML = '<i class="fas fa-sun"></i>';
-        } else {
-          toggleDarkModeBtn.innerHTML = '<i class="fas fa-moon"></i>';
+        const currentTheme = localStorage.getItem("theme");
+        if (currentTheme === "dark") {
+            document.body.classList.add("dark-mode");
+        } else if (currentTheme === "light") {
+            document.body.classList.remove("dark-mode");
+        } else if (prefersDarkScheme.matches) {
+            document.body.classList.add("dark-mode");
         }
-        localStorage.setItem("theme", theme);
-      });
+
+        toggleDarkModeBtn.addEventListener("click", function () {
+            const isDarkMode = document.body.classList.contains("dark-mode");
+
+            // Ask for confirmation only if switching from dark mode to light mode
+            if (isDarkMode) {
+                const userConfirmed = confirm("Are you sure you want to switch to light mode?");
+                const really = confirm("I cannot promise to protect you anymore if you proceed. Are you sure?");
+
+                if (!userConfirmed && really) return; // Exit if user cancels
+            }
+
+            // Toggle dark mode
+            document.body.classList.toggle("dark-mode");
+
+            // Update theme in localStorage
+            const theme = document.body.classList.contains("dark-mode") ? "dark" : "light";
+            localStorage.setItem("theme", theme);
+            setTimeout(() => {
+            const isThisIt = confirm("I will give you one last chance. The universe depends on this.");
+            if (!isThisIt) return; // Exit if user cancels
+            else {
+              document.body.classList.add("dark-mode");
+              localStorage.setItem("theme", "dark");
+            }
+          }, 1000);
+        });
     });
-  </script>
+</script>
+
 </body>
 </html>
