@@ -47,6 +47,16 @@
             color: #fff;
         }
 
+        .table-responsive {
+            cursor: grab;
+            cursor: -webkit-grab;
+        }
+        
+        .table-responsive.active {
+            cursor: grabbing;
+            cursor: -webkit-grabbing;
+        }
+        
 
         /* Table Styling */
         .comparison-table {
@@ -268,7 +278,36 @@
     });
     });
     </script>
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const scrollContainer = document.querySelector('.table-responsive');
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+        
+            scrollContainer.addEventListener('mousedown', (e) => {
+                isDown = true;
+                scrollContainer.classList.add('active');
+                startX = e.pageX - scrollContainer.offsetLeft;
+                scrollLeft = scrollContainer.scrollLeft;
+            });
+            scrollContainer.addEventListener('mouseleave', () => {
+                isDown = false;
+                scrollContainer.classList.remove('active');
+            });
+            scrollContainer.addEventListener('mouseup', () => {
+                isDown = false;
+                scrollContainer.classList.remove('active');
+            });
+            scrollContainer.addEventListener('mousemove', (e) => {
+                if(!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - scrollContainer.offsetLeft;
+                const walk = (x - startX) * 1; // Adjust scroll speed here
+                scrollContainer.scrollLeft = scrollLeft - walk;
+            });
+        });
+        </script>
 <body>
     <!-- Title Section -->
     <header class="title-section text-center">
@@ -322,7 +361,7 @@
         {% load custom_filters %}
 
         <div class="table-responsive">
-            <table class="table comparison-table table-hover align-middle text-center rounded">
+            <table class="table comparison-table table-hover align-middle text-center rounded table-responsive ">
                 <!-- Header Row with Package Names and Logos -->
                 <thead class="align-middle">
                     <tr>
