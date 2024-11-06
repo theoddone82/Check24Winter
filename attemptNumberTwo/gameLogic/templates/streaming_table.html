@@ -235,7 +235,6 @@
             background-color: #333333;
             color: #ffffff;
         }
-
     </style>
 </head>
 <script>// Dark Mode Toggle
@@ -244,10 +243,8 @@
         var infoDiv = document.getElementById('selectedPackagesInfo');
         if (infoDiv.style.display === 'none' || infoDiv.style.display === '') {
             infoDiv.style.display = 'block';
-            this.textContent = 'Hide Selected Packages';
         } else {
             infoDiv.style.display = 'none';
-            this.textContent = 'Show Selected Packages';
         }
     });
     const toggleDarkModeBtn = document.getElementById('darkModeToggle');
@@ -316,7 +313,7 @@
 
             <div class="position-relative mt-3">
                 <div class="d-flex justify-content-center gap-3">
-                    <button id="toggleSelectedPackagesBtn" class="btn btn-primary mt-4 position-absolute start-0">Beste Auswahl anzeigen</button>
+                    <button id="toggleSelectedPackagesBtn" class="btn btn-primary mt-4 position-absolute start-0">Beste Kombination</button>
                     <a href="/" class="btn btn-primary mt-4 text-decoration-none">Homescreen</a>
                     <button type="button" class="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#filterModal">
                         Filter
@@ -332,34 +329,41 @@
     <main class="container my-5">
         <!-- Div to display selected packages information -->
         <div id="selectedPackagesInfo" style="display: none;">
-            <h3 class="mt-4">Selected Packages</h3>
-            {% for package in selected_packages2 %}
-            <div class="package-card">
-                <h5>{{ package.name }}</h5>
-                <p>
-                    <strong>Monthly Price:</strong>
-                    {% if package.monthly_price_cents_float %}
-                    {{ package.monthly_price_cents_float|floatformat:2 }} €
-                    {% else %}
-                    N/A
-                    {% endif %}
-                    <br>
-                    <strong>Yearly Price:</strong>
-                    {% if package.monthly_price_yearly_subscription_in_cents_float %}
-                    {{ package.monthly_price_yearly_subscription_in_cents_float|floatformat:2 }} €
-                    {% else %}
-                    N/A
-                    {% endif %}
-                </p>
+            <h3 class="mt-4 text-center">Streaminganbieter:</h3>
+            <div class="row">
+                {% for package in selected_packages2 %}
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ package.name }}</h5>
+                            <p class="card-text">
+                                <strong>Monthly Price:</strong>
+                                {% if package.monthly_price_cents == 0 %}
+                                <strong>Free</strong>
+                                {% else %}
+                                <strong>{{ package.monthly_price_cents_float|floatformat:2|default:"---" }} €</strong>
+                                {% endif %}
+                                <br>
+                                <strong>Yearly Price:</strong>
+                                {% if package.monthly_price_yearly_subscription_in_cents == 0 %}
+                                <strong>Free</strong>
+                                {% else %}
+                                <strong>{{ package.monthly_price_yearly_subscription_in_cents_float|floatformat:2|default:"---" }}
+                                    €</strong>
+                                {% endif %}
+                            </p>
+                            <!-- Optional: Add a button or link -->
+                            <a href="#" class="btn btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
     </main>
 
     <main class="container my-5">
-
         {% load custom_filters %}
-
         <div class="table-responsive">
             <table class="table comparison-table table-hover align-middle text-center rounded table-responsive ">
                 <!-- Header Row with Package Names and Logos -->
@@ -417,7 +421,7 @@
                     {% endfor %}
 
                     <!-- Optional Price Rows -->
-                    <tr class="table-primary">
+                    <tr>
                         <th scope="row">Monthly Price</th>
                         {% for package in packages %}
                         <td colspan="2">
@@ -429,7 +433,7 @@
                         </td>
                         {% endfor %}
                     </tr>
-                    <tr class="table-primary">
+                    <tr>
                         <th scope="row">Yearly Price</th>
                         {% for package in packages %}
                         <td colspan="2">
