@@ -35,7 +35,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # Directory where collectstatic will collect static files
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'Check24Winter/static'),  # Replace 'your_app_name' with your actual app name if you have app-specific static files
+    os.path.join(BASE_DIR, 'staticFiles'),  # Replace 'your_app_name' with your actual app name if you have app-specific static files
 ]
 
 # Media files settings
