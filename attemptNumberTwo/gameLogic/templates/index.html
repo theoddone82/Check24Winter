@@ -12,7 +12,8 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <title>Team Selection</title><style>/* CSS Variables for Light Mode */
+    <title>Team Selection</title>
+    <style>/* CSS Variables for Light Mode */
         :root {
             --background-color: #f5f5f5;
             --text-color: #333;
@@ -164,7 +165,6 @@
         h1 {
             font-size: 24px;
             font-weight: bold;
-            color: var(--button-background-color);
             margin-bottom: 20px;
         }
         
@@ -241,13 +241,13 @@
     });
     </script>
 <body>
-    <button id="darkModeToggle" style="display: flex;">Toggle Dark Mode</button>
+    <button class="btn btn-primary mt-4 float-end" id="darkModeToggle">Toggle Dark Mode</button>
 
     <form method="post" action="{% url 'streaming_table' %}">
         {% csrf_token %}
 
         <!-- Clubs Section -->
-        <h1>Select Clubs</h1>
+        <h1 class="mt-4">Mannschaften</h1>
         <div class="option-container clubs">
             {% for club in form.clubs %}
             <div class="{% if forloop.counter > 10 %}hidden extra-option{% endif %}">
@@ -261,12 +261,12 @@
             {% endfor %}
         </div>
         <!-- Buttons for Clubs -->
-        <button type="button" class="button" onclick="selectAllOptions('clubs', true)">Select All Clubs</button>
-        <button type="button" class="button" onclick="selectAllOptions('clubs', false)">Deselect All Clubs</button>
-        <button type="button" class="button" id="showMoreBtn-clubs" onclick="showMoreOptions('clubs')">Show More Clubs</button>
+        <button type="button" class="button" onclick="selectAllOptions('clubs', true)">Alle auswählen</button>
+        <button type="button" class="button" onclick="selectAllOptions('clubs', false)">Auswahl entfernen</button>
+        <button type="button" class="button" id="showMoreBtn-clubs" onclick="showMoreOptions('clubs')">weitere anzeigen</button>
 
         <!-- Leagues Section -->
-        <h1>Select Leagues</h1>
+        <h1 class="mt-4">Meisterschaften</h1>
         <div class="option-container lieges">
             {% for league in form.lieges %}
             <div class="{% if forloop.counter > 10 %}hidden extra-option{% endif %}">
@@ -280,12 +280,12 @@
             {% endfor %}
         </div>
         <!-- Buttons for Leagues -->
-        <button type="button" class="button" onclick="selectAllOptions('lieges', true)">Select All Leagues</button>
-        <button type="button" class="button" onclick="selectAllOptions('lieges', false)">Deselect All Leagues</button>
-        <button type="button" class="button" id="showMoreBtn-lieges" onclick="showMoreOptions('lieges')">Show More Leagues</button>
+        <button type="button" class="button" onclick="selectAllOptions('lieges', true)">Alle auswählen</button>
+        <button type="button" class="button" onclick="selectAllOptions('lieges', false)">Auswahl entfernen</button>
+        <button type="button" class="button" id="showMoreBtn-lieges" onclick="showMoreOptions('lieges')">weitere anzeigen</button>
 
         <!-- Submit Button -->
-        <button type="submit" class="button">Submit</button>
+        <button type="submit" class="button">Ergebnis anzeigen</button>
     </form>
 
 </body>

@@ -4,6 +4,8 @@
 <html lang="en">
 
 <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
     <meta charset="UTF-8">
     <!-- Responsive viewport -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,13 +16,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         integrity="sha512-pY1zVjNnU4l6p1zxVQxFlIB9o4v0OKxMKkKdV9gvgdtf9gEJ8RG8/pS05BLo4B7N/dK7KgfFhc6Xd2YW4dN7vA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom CSS for minimal adjustments -->
     <style>
-        body {
-            background-color: #f5f5f5;
-            color: #333;
-        }
 
         /* CHECK24 Color Variables */
         :root {
@@ -49,21 +47,6 @@
             color: #fff;
         }
 
-        /* Buttons */
-        .btn-check24 {
-            background-color: #fff;
-            color: var(--check24-blue);
-            border: 1px solid var(--check24-blue);
-            font-weight: bold;
-            padding: 10px 20px;
-            margin: 5px;
-            border-radius: 0.25rem;
-        }
-
-        .btn-check24:hover {
-            background-color: var(--check24-blue);
-            color: #fff;
-        }
 
         /* Table Styling */
         .comparison-table {
@@ -244,99 +227,70 @@
         }
 
     </style>
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <title>Streaming Packages Comparison</title>
 </head>
+<script>// Dark Mode Toggle
+    document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById('toggleSelectedPackagesBtn').addEventListener('click', function () {
+        var infoDiv = document.getElementById('selectedPackagesInfo');
+        if (infoDiv.style.display === 'none' || infoDiv.style.display === '') {
+            infoDiv.style.display = 'block';
+            this.textContent = 'Hide Selected Packages';
+        } else {
+            infoDiv.style.display = 'none';
+            this.textContent = 'Show Selected Packages';
+        }
+    });
+    const toggleDarkModeBtn = document.getElementById('darkModeToggle');
+    const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+    
+    const currentTheme = localStorage.getItem("theme");
+    if (currentTheme == "dark") {
+        document.body.classList.add("dark-mode");
+        toggleDarkModeBtn.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+    } else if (currentTheme == "light") {
+        document.body.classList.remove("dark-mode");
+    } else if (prefersDarkScheme.matches) {
+        document.body.classList.add("dark-mode");
+        toggleDarkModeBtn.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+    }
+    
+    toggleDarkModeBtn.addEventListener("click", function () {
+        console.log("clicked");
+        document.body.classList.toggle("dark-mode");
+        let theme = "light";
+        if (document.body.classList.contains("dark-mode")) {
+            theme = "dark";
+            toggleDarkModeBtn.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+        } else {
+            toggleDarkModeBtn.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+        }
+        localStorage.setItem("theme", theme);
+    });
+    });
+    </script>
 
 <body>
-
     <!-- Title Section -->
     <header class="title-section text-center">
         <div class="container">
             <h2>Paketvergleich</h2>
 
-            <div class="mt-3">
-                <a href="/" class="btn btn-check24 text-decoration-none">Homescreen</a>
-                <button type="button" class="btn btn-check24" data-bs-toggle="modal" data-bs-target="#filterModal">
-                    Filter
-                </button>
-
-                <a href="#" class="btn btn-check24 text-decoration-none">Sortierung</a>
+            <div class="position-relative mt-3">
+                <div class="d-flex justify-content-center gap-3">
+                    <button id="toggleSelectedPackagesBtn" class="btn btn-primary mt-4 position-absolute start-0">Beste Auswahl anzeigen</button>
+                    <a href="/" class="btn btn-primary mt-4 text-decoration-none">Homescreen</a>
+                    <button type="button" class="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#filterModal">
+                        Filter
+                    </button>
+                    <a href="#" class="btn btn-primary mt-4">Sortierung</a>
+                    <button class="btn btn-primary mt-4 position-absolute end-0" id="darkModeToggle">Toggle Dark Mode</button>
+                </div>
             </div>
         </div>
     </header>
     
-<!-- streaming_table.html -->
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <!-- [Your existing head content remains unchanged] -->
-    <style>
-        /* [Your existing CSS code remains unchanged] */
-
-        /* Add custom styles for the selected packages display */
-        #selectedPackagesInfo {
-            margin-top: 20px;
-        }
-
-        .package-card {
-            border: 1px solid #dee2e6;
-            border-radius: 0.25rem;
-            padding: 15px;
-            margin-bottom: 15px;
-            background-color: #fff;
-        }
-
-        .package-card h5 {
-            margin-top: 0;
-            color: var(--check24-blue);
-        }
-    </style>
-</head>
-    <script>// Dark Mode Toggle
-        document.addEventListener("DOMContentLoaded", function () {
-
-        const toggleDarkModeBtn = document.getElementById('darkModeToggle');
-        const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
-        
-        const currentTheme = localStorage.getItem("theme");
-        if (currentTheme == "dark") {
-            document.body.classList.add("dark-mode");
-            toggleDarkModeBtn.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
-        } else if (currentTheme == "light") {
-            document.body.classList.remove("dark-mode");
-        } else if (prefersDarkScheme.matches) {
-            document.body.classList.add("dark-mode");
-            toggleDarkModeBtn.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
-        }
-        
-        toggleDarkModeBtn.addEventListener("click", function () {
-            console.log("clicked");
-            document.body.classList.toggle("dark-mode");
-            let theme = "light";
-            if (document.body.classList.contains("dark-mode")) {
-                theme = "dark";
-                toggleDarkModeBtn.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
-            } else {
-                toggleDarkModeBtn.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
-            }
-            localStorage.setItem("theme", theme);
-        });
-        });
-        </script>
-
     <!-- [Your existing body content up to the main container remains unchanged] -->
     <main class="container my-5">
-
-        <!-- [Your existing table code remains unchanged] -->
-
-        <!-- Add the button to show/hide selected packages -->
-        <button id="toggleSelectedPackagesBtn" class="btn btn-primary mt-4">Show Selected Packages</button>
-        <button class="btn btn-primary mt-4 float-end" id="darkModeToggle">Toggle Dark Mode</button>
-
         <!-- Div to display selected packages information -->
         <div id="selectedPackagesInfo" style="display: none;">
             <h3 class="mt-4">Selected Packages</h3>
@@ -361,28 +315,7 @@
             </div>
             {% endfor %}
         </div>
-
     </main>
-
-    <!-- [Your existing footer remains unchanged] -->
-
-    <!-- Include Bootstrap JS if necessary -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Add the JavaScript to handle the button click -->
-    <script>
-        document.getElementById('toggleSelectedPackagesBtn').addEventListener('click', function () {
-            var infoDiv = document.getElementById('selectedPackagesInfo');
-            if (infoDiv.style.display === 'none' || infoDiv.style.display === '') {
-                infoDiv.style.display = 'block';
-                this.textContent = 'Hide Selected Packages';
-            } else {
-                infoDiv.style.display = 'none';
-                this.textContent = 'Show Selected Packages';
-            }
-        });
-    </script>
-</body>
 
     <main class="container my-5">
 
@@ -393,11 +326,9 @@
                 <!-- Header Row with Package Names and Logos -->
                 <thead class="align-middle">
                     <tr>
-                        <th scope="col">League</th>
+                        <th scope="col">Mannschaften/ <br>Meisterschaften</th>
                         {% for package in packages %}
                         <th scope="col" style="min-width: 200px;" colspan="2">
-                            <!-- <img src="{{ package.logo }}" alt="{{ package.name }} logo" class="img-fluid"><br> -->
-                            <!-- Example usage -->
                             <i class="fab fa-amazon fa-2x"></i>
                             <br>
                             {{ package.name }}
@@ -479,14 +410,9 @@
     <!-- Footer Section -->
     <footer class="footer-section py-4">
         <div class="container text-center">
-            <p class="mb-0">&copy; {{ current_year }} Your Company. All rights reserved.</p>
+            <p class="mb-0">&copy; {{ current_year }} Sendling incorportaed. All rights by me</p>
         </div>
     </footer>
-
-    <!-- Include Bootstrap JS if necessary -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
 <!-- Filter Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -544,3 +470,4 @@
         </form>
     </div>
 </div>
+</html>
