@@ -31,3 +31,9 @@ class lieges(models.Model):
     score = models.IntegerField(null=True)
     def __str__(self):
         return self.name  # This will be displayed in the ModelChoiceField
+    
+class db_cache(models.Model):
+    key = models.CharField(max_length=10000)
+    value = models.CharField(max_length=10000)
+    def __str__(self):
+        return self.key  # This will be displayed in the ModelChoiceField

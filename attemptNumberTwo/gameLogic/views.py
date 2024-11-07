@@ -17,6 +17,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.db.models import Case, When, Value, F, FloatField
 from django.db.models.functions import Coalesce, NullIf
+from django.core.exceptions import BadRequest
 
 
 def generate_cache_key(selected_clubs, selected_lieges):
@@ -34,6 +35,10 @@ def generate_cache_key(selected_clubs, selected_lieges):
     return cache_key
 
 def streaming_table(request):
+    form = footballTeamForm.TeamSelectionForm()
+    return render(request, 'index.html', {'form': form})
+
+def display_table(request):
     if request.method == "POST":
         selectedClubs = request.POST.getlist('clubs') 
         selectedLieges = request.POST.getlist('lieges') 
@@ -199,9 +204,7 @@ def streaming_table(request):
 
         return render(request, 'streaming_table.html', context)
     else:
-        form = footballTeamForm.TeamSelectionForm()
-        return render(request, 'index.html', {'form': form})
-
+        return BadRequest
 
 def fetch_league_details(request, league_id):
     # Get the league object based on the provided ID

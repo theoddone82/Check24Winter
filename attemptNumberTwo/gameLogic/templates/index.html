@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,10 +9,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Add this in the <head> section of your HTML -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-        integrity="sha512-pY1zVjNnU4l6p1zxVQxFlIB9o4v0OKxMKkKdV9gvgdtf9gEJ8RG8/pS05BLo4B7N/dK7KgfFhc6Xd2YW4dN7vA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <title>Team Selection</title>
     <style>/* CSS Variables for Light Mode */
@@ -243,7 +241,7 @@
 <body>
     <button class="btn btn-primary mt-4 position-absolute end-0" id="darkModeToggle">Toggle Dark Mode</button>
 
-    <form method="post" action="{% url 'streaming_table' %}">
+    <form method="post" action="{% url 'display_table' %}">
         {% csrf_token %}
 
         <!-- Clubs Section -->
