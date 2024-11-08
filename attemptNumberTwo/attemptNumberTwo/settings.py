@@ -33,8 +33,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Static files settings
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # Directory where collectstatic will collect static files
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Directory where collectstatic will collect static files
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Media files settings
 MEDIA_URL = '/media/'
