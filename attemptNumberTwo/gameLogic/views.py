@@ -50,12 +50,6 @@ def display_table(request):
         context = None
         # Check if the context is in the cache
         # context = cache.get(cache_key)
-        if not context:
-            # Check if the context is in the database cache
-            db_cache_object = db_cache.objects.filter(key=cache_key).first()
-            if db_cache_object:
-                context = list(db_cache_object.value)
-                print("Serving from database cache")
         if context:
             print("Serving from cache")
             return render(request, 'streaming_table.html', context)
@@ -159,35 +153,44 @@ def display_table(request):
 
         # Implement greedy algorithm to select best budget packages
         selected_packages = set()
-        remaining_tournaments = set(required_tournaments)
-        while remaining_tournaments:
-            best_package = None
-            best_coverage = set()
-            best_cost_per_tournament = float('inf')
+        try:
+            selected_packages  =  db_cache.objects.filter(key=cache_key).first()
+        except Exception as e:
+            print(e)
+            print("error")
+            selected_packages = set()
 
-            for package_id, coverage in package_coverage.items():
-                if package_id in selected_packages:
-                    continue
-                new_coverage = coverage & remaining_tournaments
-                if not new_coverage:
-                    continue
-                cost = package_info[package_id]['monthly_price_yearly_subscription_in_cents']
-                if cost is None:
-                    cost = 0  # Assume free
-                if cost == 0:
-                    cost = 0.01  # Avoid division by zero
-                cost_per_tournament = cost / len(new_coverage)
-                if cost_per_tournament < best_cost_per_tournament:
-                    best_package = package_id
-                    best_coverage = new_coverage
-                    best_cost_per_tournament = cost_per_tournament
+        if selected_packages == set():
+            remaining_tournaments = set(required_tournaments)
+            while remaining_tournaments:
+                best_package = None
+                best_coverage = set()
+                best_cost_per_tournament = float('inf')
 
-            if not best_package:
-                # Cannot cover remaining tournaments
-                break
+                for package_id, coverage in package_coverage.items():
+                    if package_id in selected_packages:
+                        continue
+                    new_coverage = coverage & remaining_tournaments
+                    if not new_coverage:
+                        continue
+                    cost = package_info[package_id]['monthly_price_yearly_subscription_in_cents']
+                    if cost is None:
+                        cost = 0  # Assume free
+                    if cost == 0:
+                        cost = 0.01  # Avoid division by zero
+                    cost_per_tournament = cost / len(new_coverage)
+                    if cost_per_tournament < best_cost_per_tournament:
+                        best_package = package_id
+                        best_coverage = new_coverage
+                        best_cost_per_tournament = cost_per_tournament
 
-            selected_packages.add(best_package)
-            remaining_tournaments -= best_coverage
+                if not best_package:
+                    # Cannot cover remaining tournaments
+                    break
+
+                selected_packages.add(best_package)
+                remaining_tournaments -= best_coverage
+            
         packages_as_objects = streaming_package.objects.filter(id__in=selected_packages).annotate(
             monthly_price_cents_float=Coalesce(NullIf(F('monthly_price_cents'), 0) / 100.0, Value(None)),
             monthly_price_yearly_subscription_in_cents_float=Coalesce(NullIf(F('monthly_price_yearly_subscription_in_cents'), 0) / 100.0, Value(None))
@@ -202,12 +205,10 @@ def display_table(request):
             'selected_packages2': packages_as_objects,
             'selected_packages': selected_packages,
         }
+        # db_cache.objects.create(cache_key, selected_packages)
         print(selected_packages)
         # Cache the context for 10 minutes (600 seconds)
         cache.set(cache_key, context, 600)
-        print(cache_key)
-        print(context)
-        db_cache.objects.create(key=cache_key, value=context)
         print("succees")
         # End timing and print duration (optional)
         print(f"Total processing time: {time.time() - startTime} seconds")
