@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.urls import reverse
 from .forms import selects, footballTeamForm
-from csvFileParser.models import game, streaming_package, streaming_offer, clubs, lieges
+from csvFileParser.models import game, streaming_package, streaming_offer, clubs, lieges, db_cache
 from django.http import HttpResponse
 from django.db.models import Q
 import time
@@ -18,6 +18,8 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Case, When, Value, F, FloatField
 from django.db.models.functions import Coalesce, NullIf
 from django.core.exceptions import BadRequest
+from django.core.serializers.json import DjangoJSONEncoder
+
 
 
 def generate_cache_key(selected_clubs, selected_lieges):
@@ -45,13 +47,18 @@ def display_table(request):
 
         # Generate cache key
         cache_key = generate_cache_key(selectedClubs, selectedLieges)
-
+        context = None
         # Check if the context is in the cache
-        context = cache.get(cache_key)
+        # context = cache.get(cache_key)
+        if not context:
+            # Check if the context is in the database cache
+            db_cache_object = db_cache.objects.filter(key=cache_key).first()
+            if db_cache_object:
+                context = list(db_cache_object.value)
+                print("Serving from database cache")
         if context:
             print("Serving from cache")
             return render(request, 'streaming_table.html', context)
-
         # Start timing for performance measurement (optional)
         startTime = time.time()
 
@@ -198,7 +205,10 @@ def display_table(request):
         print(selected_packages)
         # Cache the context for 10 minutes (600 seconds)
         cache.set(cache_key, context, 600)
-
+        print(cache_key)
+        print(context)
+        db_cache.objects.create(key=cache_key, value=context)
+        print("succees")
         # End timing and print duration (optional)
         print(f"Total processing time: {time.time() - startTime} seconds")
 
