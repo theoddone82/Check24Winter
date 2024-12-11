@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.urls import reverse
 from .forms import selects, footballTeamForm
-from csvFileParser.models import game, streaming_package, streaming_offer, clubs, lieges, db_cache
+from csvFileParser.models import game, streaming_package, streaming_offer, clubs, lieges
 from django.http import HttpResponse
 from django.db.models import Q
 import time
@@ -47,9 +47,8 @@ def display_table(request):
 
         # Generate cache key
         cache_key = generate_cache_key(selectedClubs, selectedLieges)
-        context = None
         # Check if the context is in the cache
-        # context = cache.get(cache_key)
+        context = cache.get(cache_key)
         if context:
             print("Serving from cache")
             return render(request, 'streaming_table.html', context)
@@ -153,12 +152,6 @@ def display_table(request):
 
         # Implement greedy algorithm to select best budget packages
         selected_packages = set()
-        try:
-            selected_packages  =  db_cache.objects.filter(key=cache_key).first()
-        except Exception as e:
-            print(e)
-            print("error")
-            selected_packages = set()
 
         if selected_packages == set():
             remaining_tournaments = set(required_tournaments)
@@ -205,7 +198,6 @@ def display_table(request):
             'selected_packages2': packages_as_objects,
             'selected_packages': selected_packages,
         }
-        # db_cache.objects.create(cache_key, selected_packages)
         print(selected_packages)
         # Cache the context for 10 minutes (600 seconds)
         cache.set(cache_key, context, 600)
