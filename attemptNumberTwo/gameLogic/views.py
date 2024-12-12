@@ -1,27 +1,16 @@
-from django.shortcuts import render,redirect
-from django.urls import reverse
-from django.middleware.csrf import get_token
+from django.shortcuts import render
 
-from .forms import selects, footballTeamForm
+from .forms import footballTeamForm
 from csvFileParser.models import game, streaming_package, streaming_offer, clubs, lieges
-from django.http import HttpResponse
-from django.db.models import Q
-import time
-from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.db.models import Q, F, Value
 from django.db.models.functions import Coalesce
-from django.core.cache import cache
-import time
-import hashlib
 import json
-from django.http import JsonResponse
+from django.core.cache import cache
+from django.views.decorators.cache import cache_page
+import hashlib
 from django.shortcuts import get_object_or_404
-from django.db.models import Case, When, Value, F, FloatField
+from django.db.models import Case, When, Value, F, Q, FloatField
 from django.db.models.functions import Coalesce, NullIf
 from django.core.exceptions import BadRequest
-from django.core.serializers.json import DjangoJSONEncoder
-from django.views.decorators.cache import cache_page
 
 
 
@@ -54,11 +43,7 @@ def display_table(request):
         # Check if the context is in the cache
         context = cache.get(cache_key)
         if context:
-            print("Serving from cache")
             return render(request, 'streaming_table.html', context)
-        # Start timing for performance measurement (optional)
-        startTime = time.time()
-
         # Fetch liege names if any are selected
         if selectedLieges:
             lieges_but_not_db = lieges.objects.filter(id__in=selectedLieges).values_list('name', flat=True).order_by('-score')# it's a set dumbass order doesn't matter.order_by('-score')
@@ -182,7 +167,6 @@ def display_table(request):
                         best_cost_per_tournament = cost_per_tournament
 
                 if not best_package:
-                    # Cannot cover remaining tournaments
                     break
 
                 selected_packages.add(best_package)
@@ -192,9 +176,6 @@ def display_table(request):
             monthly_price_cents_float=Coalesce(NullIf(F('monthly_price_cents'), 0) / 100.0, Value(None)),
             monthly_price_yearly_subscription_in_cents_float=Coalesce(NullIf(F('monthly_price_yearly_subscription_in_cents'), 0) / 100.0, Value(None))
         )
-        print(packages_as_objects.values())
-        print(packages_as_objects.values_list())
-        # Build context
         context = {
             'packages': packages,
             'leagues': lieges_but_not_db,
@@ -202,30 +183,10 @@ def display_table(request):
             'selected_packages2': packages_as_objects,
             'selected_packages': selected_packages,
         }
-        print(selected_packages)
-        # Cache the context for 10 minutes (600 seconds)
         cache.set(cache_key, context, timeout=None)
-        print("succees")
-        # End timing and print duration (optional)
-        print(f"Total processing time: {time.time() - startTime} seconds")
-
         return render(request, 'streaming_table.html', context)
     else:
         return BadRequest
-
-def fetch_league_details(request, league_id):
-    # Get the league object based on the provided ID
-    league = get_object_or_404(league, id=league_id)    
-    
-    # Prepare the data you want to return
-    data = {
-        'description': league.description,
-        'founded_year': league.founded_year,
-        'number_of_teams': league.number_of_teams,
-        # add other fields as needed
-    }
-    
-    return JsonResponse(data)
 
 # Create your views here.
 def index(request):
@@ -235,7 +196,6 @@ def index(request):
         test={}
         streaming_packages = []
         for option in selectedClubs:
-            start_time = time.time()
             name = clubs.objects.get(id=option)
             # Look for games where the club is the home team
             games = game.objects.filter(Q(team_home=name) | Q(team_away=name))
@@ -248,7 +208,6 @@ def index(request):
                         "live": f"{t.live}",
                         "highlights": f"{t.highlights}"
                     }
-        print(time.time() - start_time)
         unique_package_ids = list(set(streaming_packages))
         packages = streaming_package.objects.filter(id__in=unique_package_ids)
         tournaments = game.objects.values_list('tournament_name', flat=True).distinct()
@@ -262,11 +221,7 @@ def index(request):
                 'monthly_price_cents': pak.monthly_price_cents / 100.0 if pak.monthly_price_cents else pak.monthly_price_cents,
                 'monthly_price_yearly_subscription_in_cents': pak.monthly_price_yearly_subscription_in_cents / 100.0 if pak.monthly_price_yearly_subscription_in_cents else pak.monthly_price_yearly_subscription_in_cents,
             }
-            print(time.time() - start_time)
-
             enriched_packages.append(enriched_package)
-        print(time.time() - start_time)
-
 
         # Pass enriched packages to the template
         return render(request, 'display_table.html', {'data': enriched_packages})
