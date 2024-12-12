@@ -1,4 +1,3 @@
-<!-- templates/performance_monitor/dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,34 +5,40 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Server Performance</h1>
-    <canvas id="cpuChart" width="400" height="200"></canvas>
-    <div>
-        <img id="htopImage" src="" alt="Htop Screenshot">
-    </div>
+    <h1>Server Performance Dashboard</h1>
+    
+    <h2>System Metrics</h2>
+    <p><strong>CPU Usage:</strong> {{ metrics.cpu }}%</p>
+    <p><strong>Memory Usage:</strong> {{ metrics.memory.percent }}%</p>
+    <p><strong>Disk Usage:</strong> {{ metrics.disk.percent }}%</p>
+
+    <h2>Htop Screenshot</h2>
+    <img src="{{ htop_image }}" alt="Htop Screenshot" width="600">
+
+    <h2>CPU Usage Over Time</h2>
+    <canvas id="cpuChart" width="600" height="300"></canvas>
+
     <script>
-        async function fetchMetrics() {
+        async function updateChart() {
             const response = await fetch('/performance/metrics/');
             const data = await response.json();
 
             const ctx = document.getElementById('cpuChart').getContext('2d');
-            new Chart(ctx, {
+            const chart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['1s', '2s', '3s', '4s', '5s'],
+                    labels: ['Now', '1s', '2s', '3s', '4s', '5s'],
                     datasets: [{
                         label: 'CPU Usage',
-                        data: [data.cpu],
+                        data: [data.cpu, ...Array(5).fill(null)], // Dynamic update
                         borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1
                     }]
                 }
             });
-
-            document.getElementById('htopImage').src = `/performance/htop-screenshot/`;
         }
-
-        fetchMetrics();
+        
+        updateChart();
     </script>
 </body>
 </html>
