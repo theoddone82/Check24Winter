@@ -1,5 +1,7 @@
 from django.shortcuts import render,redirect
 from django.urls import reverse
+from django.middleware.csrf import get_token
+
 from .forms import selects, footballTeamForm
 from csvFileParser.models import game, streaming_package, streaming_offer, clubs, lieges
 from django.http import HttpResponse

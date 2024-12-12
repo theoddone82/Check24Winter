@@ -75,7 +75,7 @@
     <button class="btn btn-primary mt-4 position-absolute end-0" id="darkModeToggle">Toggle Dark Mode</button>
 
     <form method="post" action="{% url 'display_table' %}">
-        {% csrf_token %}
+        <input type="hidden" name="csrfmiddlewaretoken" value="csrf_token_placeholder">
 
         <!-- Clubs Section -->
         <h1 class="mt-4">Mannschaften</h1>
