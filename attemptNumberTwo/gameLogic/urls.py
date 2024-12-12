@@ -20,7 +20,6 @@ from django.urls.conf import include
 from . import views
 
 urlpatterns = [
-    path('index', views.index, name='index'),
     path('matchmaking/', views.streaming_table, name='streaming_table'),
     path('' , views.homepage, name='homepage'),
     path('display_table/', views.display_table, name='display_table'),

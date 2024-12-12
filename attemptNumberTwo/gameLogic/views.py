@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.urls import reverse
 
 from .forms import footballTeamForm
 from csvFileParser.models import game, streaming_package, streaming_offer, clubs, lieges
@@ -28,7 +29,7 @@ def generate_cache_key(selected_clubs, selected_lieges):
     cache_key = f'streaming_table_{key_hash}'
     return cache_key
 
-@cache_page(9999999, key_prefix="site1")
+@cache_page(9999999, key_prefix="selection")
 def streaming_table(request):
     form = footballTeamForm.TeamSelectionForm()
     return render(request, 'index.html', {'form': form})
@@ -37,17 +38,14 @@ def display_table(request):
     if request.method == "POST":
         selectedClubs = request.POST.getlist('clubs') 
         selectedLieges = request.POST.getlist('lieges') 
-
-        # Generate cache key
         cache_key = generate_cache_key(selectedClubs, selectedLieges)
-        # Check if the context is in the cache
         context = cache.get(cache_key)
         if context:
             return render(request, 'streaming_table.html', context)
+        
         # Fetch liege names if any are selected
         if selectedLieges:
-            lieges_but_not_db = lieges.objects.filter(id__in=selectedLieges).values_list('name', flat=True).order_by('-score')# it's a set dumbass order doesn't matter.order_by('-score')
-            
+            lieges_but_not_db = lieges.objects.filter(id__in=selectedLieges).values_list('name', flat=True).order_by('-score')# it's a set dumbass order doesn't matter.order_by('-score')    
         else:
             lieges_but_not_db = set()
 
@@ -57,9 +55,7 @@ def display_table(request):
         else:
             clubList = clubs.objects.all()
 
-        # Extract club names
         club_names = clubList.values_list('name', flat=True)
-
         # Fetch games involving selected clubs and lieges
         games_query = Q(team_home__in=club_names) | Q(team_away__in=club_names)
         if lieges_but_not_db:
@@ -141,37 +137,35 @@ def display_table(request):
 
         # Implement greedy algorithm to select best budget packages
         selected_packages = set()
+        remaining_tournaments = set(required_tournaments)
+        while remaining_tournaments:
+            best_package = None
+            best_coverage = set()
+            best_cost_per_tournament = float('inf')
 
-        if selected_packages == set():
-            remaining_tournaments = set(required_tournaments)
-            while remaining_tournaments:
-                best_package = None
-                best_coverage = set()
-                best_cost_per_tournament = float('inf')
+            for package_id, coverage in package_coverage.items():
+                if package_id in selected_packages:
+                    continue
+                new_coverage = coverage & remaining_tournaments
+                if not new_coverage:
+                    continue
+                cost = package_info[package_id]['monthly_price_yearly_subscription_in_cents']
+                if cost is None:
+                    cost = 0  # Assume free
+                if cost == 0:
+                    cost = 0.01  # Avoid division by zero
+                cost_per_tournament = cost / len(new_coverage)
+                if cost_per_tournament < best_cost_per_tournament:
+                    best_package = package_id
+                    best_coverage = new_coverage
+                    best_cost_per_tournament = cost_per_tournament
 
-                for package_id, coverage in package_coverage.items():
-                    if package_id in selected_packages:
-                        continue
-                    new_coverage = coverage & remaining_tournaments
-                    if not new_coverage:
-                        continue
-                    cost = package_info[package_id]['monthly_price_yearly_subscription_in_cents']
-                    if cost is None:
-                        cost = 0  # Assume free
-                    if cost == 0:
-                        cost = 0.01  # Avoid division by zero
-                    cost_per_tournament = cost / len(new_coverage)
-                    if cost_per_tournament < best_cost_per_tournament:
-                        best_package = package_id
-                        best_coverage = new_coverage
-                        best_cost_per_tournament = cost_per_tournament
+            if not best_package:
+                break
 
-                if not best_package:
-                    break
-
-                selected_packages.add(best_package)
-                remaining_tournaments -= best_coverage
-            
+            selected_packages.add(best_package)
+            remaining_tournaments -= best_coverage
+        
         packages_as_objects = streaming_package.objects.filter(id__in=selected_packages).annotate(
             monthly_price_cents_float=Coalesce(NullIf(F('monthly_price_cents'), 0) / 100.0, Value(None)),
             monthly_price_yearly_subscription_in_cents_float=Coalesce(NullIf(F('monthly_price_yearly_subscription_in_cents'), 0) / 100.0, Value(None))
@@ -186,50 +180,7 @@ def display_table(request):
         cache.set(cache_key, context, timeout=None)
         return render(request, 'streaming_table.html', context)
     else:
-        return BadRequest
-
-# Create your views here.
-def index(request):
-    if request.method == "POST":
-        selectedClubs = request.POST.getlist('clubs')
-
-        test={}
-        streaming_packages = []
-        for option in selectedClubs:
-            name = clubs.objects.get(id=option)
-            # Look for games where the club is the home team
-            games = game.objects.filter(Q(team_home=name) | Q(team_away=name))
-            for g in games:
-                temp = streaming_offer.objects.filter(game_id=g.id)
-                for t in temp:
-                    # if t.live and t.highlights:
-                    streaming_packages.append(t.streaming_package_id.id)
-                    test[f"{g.tournament_name}"] = {  # Adding the game with parameters
-                        "live": f"{t.live}",
-                        "highlights": f"{t.highlights}"
-                    }
-        unique_package_ids = list(set(streaming_packages))
-        packages = streaming_package.objects.filter(id__in=unique_package_ids)
-        tournaments = game.objects.values_list('tournament_name', flat=True).distinct()
-
-        enriched_packages = []
-        for pak in packages:
-
-            # Add additional parameters to each package dictionary
-            enriched_package = {
-                'name': pak.name,
-                'monthly_price_cents': pak.monthly_price_cents / 100.0 if pak.monthly_price_cents else pak.monthly_price_cents,
-                'monthly_price_yearly_subscription_in_cents': pak.monthly_price_yearly_subscription_in_cents / 100.0 if pak.monthly_price_yearly_subscription_in_cents else pak.monthly_price_yearly_subscription_in_cents,
-            }
-            enriched_packages.append(enriched_package)
-
-        # Pass enriched packages to the template
-        return render(request, 'display_table.html', {'data': enriched_packages})
-    
-    else:
-        form = footballTeamForm.TeamSelectionForm()
-        return render(request, 'index.html', {'form': form})
-    
+        return redirect(reverse('homepage')) # in case someone trys to access the page without submitting the form
 
 def homepage(request):
     return render(request, 'homepage.html')
