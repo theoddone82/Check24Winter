@@ -37,7 +37,7 @@ def generate_cache_key(selected_clubs, selected_lieges):
     cache_key = f'streaming_table_{key_hash}'
     return cache_key
 
-@cache_page(99999999999999999999999, key_prefix="site1")
+@cache_page(9999999, key_prefix="site1")
 def streaming_table(request):
     form = footballTeamForm.TeamSelectionForm()
     return render(request, 'index.html', {'form': form})
