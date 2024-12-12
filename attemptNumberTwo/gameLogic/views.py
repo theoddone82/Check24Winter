@@ -19,6 +19,7 @@ from django.db.models import Case, When, Value, F, FloatField
 from django.db.models.functions import Coalesce, NullIf
 from django.core.exceptions import BadRequest
 from django.core.serializers.json import DjangoJSONEncoder
+from django.views.decorators.cache import cache_page
 
 
 
@@ -36,6 +37,7 @@ def generate_cache_key(selected_clubs, selected_lieges):
     cache_key = f'streaming_table_{key_hash}'
     return cache_key
 
+@cache_page(99999999999999999999999, key_prefix="site1")
 def streaming_table(request):
     form = footballTeamForm.TeamSelectionForm()
     return render(request, 'index.html', {'form': form})
@@ -200,7 +202,7 @@ def display_table(request):
         }
         print(selected_packages)
         # Cache the context for 10 minutes (600 seconds)
-        cache.set(cache_key, context, 600)
+        cache.set(cache_key, context, timeout=None)
         print("succees")
         # End timing and print duration (optional)
         print(f"Total processing time: {time.time() - startTime} seconds")
