@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'attemptNumberTwo',
     'import_export',
     'gameLogic',
+    'performance_monitor',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
