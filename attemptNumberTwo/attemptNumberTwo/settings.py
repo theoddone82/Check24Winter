@@ -36,7 +36,6 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Directory where collectstatic will collect static files
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
-    '/tmp',  # Temporary storage for htop screenshot
 ]
 
 # Media files settings
@@ -49,7 +48,6 @@ INSTALLED_APPS = [
     'attemptNumberTwo',
     'import_export',
     'gameLogic',
-    'performance_monitor',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
