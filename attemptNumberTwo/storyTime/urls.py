@@ -26,8 +26,8 @@ urlpatterns = [
     path('' , views.story, name='homepage'),
     path('shooting_stars/', views.shooting_stars, name='shooting_stars'),
     path('timeline/', views.timeline, name='timeline'),
-    path('2022' , views.story22, name='2022'),
-    path('2023' , views.story23, name='2023'),
-    path('2024' , views.story24, name='2024'),
+    path('2022/' , views.story22, name='2022'),
+    path('2023/' , views.story23, name='2023'),
+    path('2024/' , views.story24, name='2024'),
 
 ]

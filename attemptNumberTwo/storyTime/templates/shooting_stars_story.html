@@ -1,23 +1,103 @@
 {% load static %} {% load livereload_tags %} {% livereload_script %}
-
 <body>
+  <div class="button-container">
+    <a class="year_pointer button" href="{% url '2022' %}">2022</a>
+    <a class="year_pointer button" href="{% url '2023' %}">2023</a>
+    <a class="year_pointer button" href="{% url '2024' %}">2024</a>
+  </div>
+  <div class="year-container">
+    <div class="year">
+      <span class="digit" data-hover="true">2</span>
+      <span class="digit" data-hover="true">0</span>
+      <span class="digit" data-hover="true">2</span>
+      <span class="last-digit digit" data-hover="true">{{last_digit}}</span>
+    </div>
+  </div>  
   <div class="sky"></div>
   <div id="image-track" data-mouse-down-at="0" data-prev-percentage="0">
     {% for image in images %}
-    <img src="{% static image %}" class="image" draggable="false" />
+    <img
+      src="{% static image %}"
+      class="image"
+      draggable="false"
+      tabindex="0"
+    />
     {% endfor %}
   </div>
 </body>
+</body>
+<style>
+.digit {
+  display: inline-block;
+  position: relative;
+  color: #ffdd00; /* Highlight color on hover */
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  /* i do not want the be able to click my digits or select them */
+  user-select: none;
+}
 
+.year {
+  font-size: 10rem; /* Size of the numbers */
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.digit:hover {
+  transform: translateY(-10px) rotate(10deg); /* Move and rotate on hover */
+  color: #ffdd00; /* Highlight color on hover */
+  text-shadow: 3px 3px 15px rgba(255, 221, 0, 0.7); /* Glow effect */
+}
+</style>
+</style>
+<style>
+  /* Style the button container */
+.button-container {
+  position: fixed; /* Stays fixed in the viewport */
+  top: 10px; /* Adjust distance from the top */
+  left: 10px; /* Adjust distance from the left */
+  display: flex; /* Arrange buttons in a row */
+  gap: 10px; /* Add space between buttons */
+  z-index: 1000; /* Ensure buttons stay above other content */
+}
+
+/* Style individual buttons */
+.button {
+  text-decoration: none;
+  padding: 10px 20px; /* Space inside the button */
+  color: white; /* Text color */
+  background-color: #333; /* Darker button background */
+  border: 1px solid #555; /* Subtle border */
+  border-radius: 5px; /* Rounded corners */
+  font-size: 14px; /* Adjust font size */
+  font-family: Arial, sans-serif; /* Clean font */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Add slight shadow */
+}
+
+/* Hover effect for buttons */
+.button:hover {
+  background-color: #444; /* Slightly lighter on hover */
+  transform: scale(1.05); /* Slightly enlarge */
+  cursor: pointer;
+}
+
+/* Active effect for buttons */
+.button:active {
+  background-color: #555; /* Slightly darker when clicked */
+  transform: scale(0.95); /* Slightly shrink */
+}
+</style>
 <style>
   body {
+    /* overflow: hidden; */
+    background: radial-gradient(circle at 50% 50%, #002244, #000814 80%);
     height: 100vh;
     width: 100vw;
-    background-color: black;
     margin: 0rem;
     overflow: hidden;
   }
-
   #image-track {
     display: flex;
     gap: 4vmin;
@@ -29,84 +109,56 @@
   }
   /* Smooth transition for scaling and positioning */
   #image-track > .image {
-    width: 40vmin;
-    height: 56vmin;
-    object-fit: cover; /* Initially crop the image */
-    object-position: 100% center; /* Start showing from the right */
-    transition: transform 0.5s ease, object-position 0.5s ease,
-      z-index 0.5s ease;
-    cursor: pointer;
+    box-shadow: rgba(4, 109, 255, 0.762) 0px 10px 36px 0px,
+      rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+    max-width: 40vmin; /* Initial size constraint for responsive design */
+    max-height: 56vmin; /* Initial size constraint for responsive design */
+    object-fit: cover;
+    object-position: 100% 50%;
+    transition: transform 1s ease, max-width 1s ease, max-height 1s ease,
+      z-index 1s ease; /* Smooth transition */
   }
 
-  #image-track > .image.expanded {
-    z-index: 10; /* Bring the image above all others */
-    transform: scale(2); /* Scale the image */
-    object-fit: contain; /* Show the entire image */
-    object-position: center; /* Center the image */
-    cursor: pointer; /* Ensure the cursor remains a pointer */
+  #image-track > .image:focus {
+    transform: scale(1.2); /* Slightly enlarge the image */
+    z-index: 10; /* Bring the hovered image forward */
+    min-width: 40vmin;
+    min-height: 56vmin;
+    max-width: 80vmin; /* Set a larger numerical value instead of 'none' */
+    max-height: 56vmin; /* Remove constraints to show full intrinsic size */
   }
+  #image-track > .image.focused {
+  transform: scale(1.2); /* Slightly enlarge the image */
+    z-index: 10; /* Bring the hovered image forward */
+    min-width: 40vmin;
+    min-height: 56vmin;
+    max-width: 80vmin; /* Set a larger numerical value instead of 'none' */
+    max-height: 56vmin; /* Remove constraints to show full intrinsic size */
+}
 
-  /* -- YouTube Link Styles -- */
 
-  body.menu-toggled > .meta-link > span {
-    color: rgb(30, 30, 30);
+  #image-track > .image:not(:focus) {
+    min-width: 40vmin;
+    min-height: 56vmin;
+    max-width: 40vmin; /* Maintain constrained size for other images */
+    max-height: 56vmin;
   }
-
-  #source-link {
-    bottom: 60px;
-  }
-
-  #source-link > i {
-    color: rgb(94, 106, 210);
-  }
-
-  #yt-link > i {
-    color: rgb(239, 83, 80);
-  }
-
-  .meta-link {
-    align-items: center;
-    backdrop-filter: blur(3px);
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
-    bottom: 10px;
-    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    display: inline-flex;
-    gap: 5px;
-    left: 10px;
-    padding: 10px 20px;
-    position: fixed;
-    text-decoration: none;
-    transition: background-color 400ms, border-color 400ms;
-    z-index: 10000;
-  }
-
-  .meta-link:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
-  .meta-link > i,
-  .meta-link > span {
-    height: 20px;
-    line-height: 20px;
-  }
-
-  .meta-link > span {
-    color: white;
-    font-family: "Rubik", sans-serif;
-    font-weight: 500;
+  .sky {
+    pointer-events: none; /* Ensure it does not block clicks */
   }
 </style>
 
 <script>
+  let isUserInteracting = false;
   const track = document.getElementById("image-track");
 
-  const handleOnDown = (e) => (track.dataset.mouseDownAt = e.clientX);
-
+  const handleOnDown = (e) => {
+    isUserInteracting = true; // Pause auto-scroll
+    track.dataset.mouseDownAt = e.clientX; // Set the starting mouse position
+    track.dataset.prevPercentage = track.dataset.percentage || "0"; // Synchronize with the current percentage
+  };
   const handleOnUp = () => {
+    isUserInteracting = false; // Resume auto-scroll
     track.dataset.mouseDownAt = "0";
     track.dataset.prevPercentage = track.dataset.percentage;
   };
@@ -120,7 +172,7 @@
     const percentage = ((mouseDelta / maxDelta) * -100) / 4,
       nextPercentageUnconstrained =
         parseFloat(track.dataset.prevPercentage) + percentage,
-      nextPercentage = Math.max(Math.min(nextPercentageUnconstrained, 0), -90);
+      nextPercentage = Math.max(Math.min(nextPercentageUnconstrained, 0), -100);
 
     track.dataset.percentage = nextPercentage;
 
@@ -131,14 +183,7 @@
       { duration: 1200, fill: "forwards" }
     );
 
-    for (const image of track.getElementsByClassName("image")) {
-      image.animate(
-        {
-          objectPosition: `${100 + nextPercentage}% center`,
-        },
-        { duration: 1200, fill: "forwards" }
-      );
-    }
+    updateVisibleImages();
   };
 
   /* -- Had to add extra lines for touch events -- */
@@ -156,57 +201,270 @@
   window.ontouchmove = (e) => handleOnMove(e.touches[0]);
 </script>
 <script>
-  // Update position and object position on scroll
-  const handleScroll = () => {
-    const maxScroll = document.body.scrollWidth - window.innerWidth; // Max horizontal scroll
-    const scrollPercentage = (window.scrollX / maxScroll) * 100; // 0-100%
 
-    // Update track position
-    track.style.transform = `translate(${scrollPercentage * -1}%, -50%)`;
+  images.forEach((image) => {
+    image.addEventListener("click", () => {
+      image.focus(); // Set focus to the clicked image
+    });
+  });
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Ensure `data-mouse-down-at` is reset on page load
+    track.dataset.mouseDownAt = "0";
+    track.dataset.prevPercentage = "0";
+    track.dataset.percentage = "0";
+  });
+</script>
 
-    // Update image sliding effect
-    for (const image of track.getElementsByClassName("image")) {
-      image.style.objectPosition = `${100 + scrollPercentage}% center`;
+<style>
+  .sky {
+    position: relative;
+    height: auto;
+    width: auto;
+  }
+
+  /* Base shooting star */
+  .shooting-star {
+    position: absolute;
+    width: 5px; /* Increased width for larger stars */
+    height: 5px; /* Increased height for larger stars */
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 1),
+      rgba(255, 255, 255, 0)
+    );
+    border-radius: 50%;
+    animation: shoot 3s linear infinite;
+    opacity: 0;
+  }
+
+  /* Animation for the shooting star */
+  @keyframes shoot {
+    0% {
+      transform: translate(0, 0) scale(1);
+      opacity: 1;
     }
+    90% {
+      opacity: 0.7;
+    }
+    100% {
+      transform: translate(-800px, 600px) scale(0.5);
+      opacity: 0;
+    }
+  }
+
+  /* Randomly positioned stars */
+  .sky .shooting-star:nth-child(1) {
+    top: 10%;
+    left: 80%;
+    animation-delay: 0s;
+  }
+
+  .sky .shooting-star:nth-child(2) {
+    top: 30%;
+    left: 70%;
+    animation-delay: 1.5s;
+  }
+
+  .sky .shooting-star:nth-child(3) {
+    top: 50%;
+    left: 90%;
+    animation-delay: 2.5s;
+  }
+
+  .sky .shooting-star:nth-child(4) {
+    top: 20%;
+    left: 60%;
+    animation-delay: 3s;
+  }
+
+  .sky .shooting-star:nth-child(5) {
+    top: 40%;
+    left: 75%;
+    animation-delay: 4s;
+  }
+</style>
+<script>
+  const sky = document.querySelector(".sky");
+
+  // Create multiple shooting stars dynamically
+  for (let i = 0; i < 20; i++) {
+    const star = document.createElement("div");
+    console.log("exe");
+    star.classList.add("shooting-star");
+
+    // Randomize position and animation delay
+    const top = Math.random() * 100;
+    const left = Math.random() * 100;
+    const delay = Math.random() * 5;
+
+    star.style.top = `${top}%`;
+    star.style.left = `${left}%`;
+    star.style.animationDelay = `${delay}s`;
+
+    sky.appendChild(star);
+  }
+</script>
+<script>
+  const slideRight = () => {
+    if (isUserInteracting) return; // Skip auto-scroll if user is interacting
+    const currentPercentage = parseFloat(track.dataset.percentage) || 0;
+    const nextPercentage = Math.max(currentPercentage - 1, -100); // Increment to the right
+    track.dataset.percentage = nextPercentage;
+    track.animate(
+      {
+        transform: `translate(${nextPercentage}%, -50%)`,
+      },
+      { duration: 1200, fill: "forwards" }
+    );
+
+    updateVisibleImages();
   };
 
-  // Listen for the scroll event
-  window.addEventListener("scroll", handleScroll);
+  // Automatically slide to the right every 1 second
+  setTimeout(() => {
+  setInterval(slideRight, 1200); // Start auto-scroll after initialization
+}, 1200);
+</script>
+<script>
+  const updateVisibleImages = () => {
+  const viewportWidth = window.innerWidth; // Total viewport width
+  const images = track.getElementsByClassName("image");
+
+  for (const image of images) {
+    const imageRect = image.getBoundingClientRect();
+
+    // Check if the image is within the viewport
+    if (imageRect.right > 0 && imageRect.left < viewportWidth) {
+      // Calculate the relative position of the image's center to the viewport
+      const imageCenterX = imageRect.left + imageRect.width / 2;
+
+      relativePosition = imageCenterX/viewportWidth * 100;
+      relativePosition = Math.min(Math.max(relativePosition, 0), 100);
+      // Animate only visible images
+      image.animate(
+        {
+          objectPosition: `${relativePosition}% 50%`,
+        },
+        { duration: 1200, fill: "forwards" }
+      );
+    }
+  }
+};
+</script>
+<script>
+  let selectedImage = null; // Tracks the currently focused image
+
+const images = document.querySelectorAll("#image-track > .image");
+
+// Add a click event listener to each image
+images.forEach((image) => {
+  image.addEventListener("click", () => {
+    // If the clicked image is already selected, do nothing
+    if (selectedImage === image) return;
+
+    // Remove the focus from the previously selected image
+    if (selectedImage) {
+      selectedImage.classList.remove("focused");
+      selectedImage.style.transform = ""; // Reset size
+      selectedImage.style.zIndex = ""; // Reset stacking
+    }
+
+    // Set the new image as selected
+    selectedImage = image;
+    selectedImage.classList.add("focused");
+    selectedImage.style.transform = "scale(1.2)"; // Enlarge the selected image
+    selectedImage.style.zIndex = 10; // Bring the selected image to the front
+  });
+});
+
 </script>
 
 <script>
-  // Store original styles for restoration
-  const imagePositions = new Map();
-
-  // Toggle expand/collapse on image click
-  const handleImageClick = (event) => {
-    console.log("clidked");
-    const image = event.target;
-
-    // If the image is already expanded
-    if (image.classList.contains("expanded")) {
-      image.classList.remove("expanded");
-
-      // Restore to original transform and object position
-      const originalTransform = imagePositions.get(image);
-      image.style.transform = originalTransform || ""; // Revert transform
-      image.style.objectPosition = "100% center"; // Reset object position
-      track.style.pointerEvents = "auto"; // Re-enable scrolling
-    } else {
-      // Save current transform to restore later
-      const currentTransform = window.getComputedStyle(image).transform;
-      imagePositions.set(image, currentTransform);
-
-      // Expand image
-      image.classList.add("expanded");
-      image.style.transform = "scale(2)"; // Scale up
-      image.style.objectPosition = "center"; // Show the full image
-      track.style.pointerEvents = "none"; // Temporarily disable scrolling
-    }
-  };
-
-  // Add click event listener to all images
-  document.querySelectorAll("#image-track .image").forEach((image) => {
-    image.addEventListener("click", handleImageClick);
+  const buttons = document.querySelectorAll(".year_pointer");
+  const lastDigit = document.querySelector(".last-digit");
+  
+  // Handle button clicks for the outgoing animation
+  buttons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.preventDefault(); // Prevent default button behavior
+  
+      const targetYear = event.target.textContent; // Get the year from the button text
+      const targetLastDigit = targetYear.slice(-1); // Get the last digit of the target year
+  
+      if (lastDigit.textContent === targetLastDigit) {
+        // If the digit is already correct, just redirect
+        window.location.href = button.href;
+        return;
+      }
+  
+      // Animate the last digit out and redirect
+      animateOutDigit(lastDigit, targetLastDigit, button.href);
+    });
   });
-</script>
+  
+  // Function to animate the outgoing digit
+  function animateOutDigit(digitElement, newDigit, redirectUrl) {
+    digitElement.classList.add("rotate-up"); // Add the rotate-up animation class
+  
+    // After the animation completes, update the digit and redirect
+    setTimeout(() => {
+      digitElement.textContent = newDigit; // Update the digit
+      digitElement.classList.remove("rotate-up"); // Reset the animation
+  
+      // Redirect after the animation completes
+      window.location.href = redirectUrl;
+    }, 500); // Match the duration of the animation (see CSS below)
+  }
+  
+  // Function to animate the incoming digit on page load
+  window.addEventListener("DOMContentLoaded", () => {
+    lastDigit.classList.add("rotate-in"); // Trigger the rotate-in animation
+  
+    // Remove the animation class after it completes
+    setTimeout(() => {
+      lastDigit.classList.remove("rotate-in");
+    }, 500); // Match the duration of the CSS animation
+  });
+  
+  </script>
+  <style>
+  .last-digit {
+    display: inline-block; /* Required for transform to work */
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Smooth movement with easing */
+  }
+  
+  /* Outgoing animation */
+  .last-digit.rotate-up {
+    transform: translateY(-100px) rotateX(90deg); /* Move up and rotate like a clock hand */
+    opacity: 0; /* Fade out during the rotation */
+  }
+  
+  /* Incoming animation */
+  .last-digit.rotate-in {
+    transform: translateY(100px) rotateX(-90deg); /* Move down and rotate in */
+    opacity: 0; /* Start invisible */
+    animation: rotateIn 0.5s forwards; /* Trigger a keyframe animation */
+  }
+  
+  /* Reset position after animations */
+  .last-digit:not(.rotate-up):not(.rotate-in) {
+    transform: translateY(0) rotateX(0); /* Reset position */
+    opacity: 1; /* Ensure visibility */
+  }
+  
+  /* Keyframe for rotate-in */
+  @keyframes rotateIn {
+    0% {
+      transform: translateY(100px) rotateX(-90deg);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0) rotateX(0);
+      opacity: 1;
+    }
+  }
+  
+  </style>
