@@ -2,3 +2,5 @@
 ./venv
 *.pyc
 
+# /attemptNumberTwo/storyTime
+/attemptNumberTwo/static/images

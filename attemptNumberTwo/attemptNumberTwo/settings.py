@@ -47,7 +47,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Stores media file
 INSTALLED_APPS = [
     'attemptNumberTwo',
     'import_export',
+    'storyTime',
     'gameLogic',
+    'gameLogicV2',        
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,7 +58,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'csvFileParser',
     'debug_toolbar',
+    'livereload',
+
 ]
+
 
 MIDDLEWARE = [
     # 'django.middleware.security.SecurityMiddleware',
@@ -68,7 +73,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     # 'csvFileParser.middleware.ReplaceCSRFTokenMiddleware',
-
+    'livereload.middleware.LiveReloadScript',
 ]
 
 INTERNAL_IPS = [

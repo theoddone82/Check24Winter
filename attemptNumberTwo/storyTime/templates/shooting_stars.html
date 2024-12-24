@@ -1,0 +1,318 @@
+{% load static %}
+
+<div class="sky">
+  <!-- Shooting stars are dynamically created using pseudo-elements or additional divs -->
+  <div class="buttons">
+    <a class="year_pointer" href="{% url '2022' %}">2022</a>
+    <a class="year_pointer" href="{% url '2023' %}">2023</a>
+    <a class="year_pointer" href="{% url '2024' %}">2024</a>
+  </div>
+</div>
+
+<div id="section-2022" class="section">
+  <div
+    class="image-track"
+    id="2022_images"
+    data-mouse-down-at="0"
+    data-prev-percentage="0"
+    data-percentage="0"
+  >
+    {% for image in images %}
+    <img src="{% static image %}" class="image" draggable="false" />
+    {% endfor %}
+  </div>
+</div>
+
+<div id="section-2023" class="section">
+  <div
+    class="image-track"
+    id="2023_images"
+    data-mouse-down-at="0"
+    data-prev-percentage="0"
+    data-percentage="0"
+  >
+    {% for image in images %}
+    <img src="{% static image %}" class="image" draggable="false" />
+    {% endfor %}
+  </div>
+</div>
+
+<div id="section-2024" class="section">
+  <div
+    class="image-track"
+    id="2024_images"
+    data-mouse-down-at="0"
+    data-prev-percentage="0"
+    data-percentage="0"
+  >
+    {% for image in images %}
+    <img src="{% static image %}" class="image" draggable="false" />
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .image-track > .image {
+    width: 40vmin;
+    height: 56vmin;
+    object-fit: cover;
+    object-position: 100% center;
+  }
+  .image-track {
+    display: flex;
+    gap: 4vmin;
+    position: relative;
+    left: 50%;
+    top: 50%;
+    transform: translate(0%, -50%);
+  }
+
+  /* Smooth transition for scaling and positioning */
+  .image-track > .image {
+    width: 40vmin;
+    height: 56vmin;
+    object-fit: cover; /* Initially crop the image */
+    object-position: 100% center; /* Start showing from the right */
+    transition: transform 0.5s ease, object-position 0.5s ease,
+      z-index 0.5s ease;
+    cursor: pointer;
+  }
+
+  .image-track > .image.expanded {
+    z-index: 10; /* Bring the image above all others */
+    transform: scale(2); /* Scale the image */
+    object-fit: contain; /* Show the entire image */
+    object-position: center; /* Center the image */
+    cursor: pointer; /* Ensure the cursor remains a pointer */
+  }
+
+  /* -- YouTube Link Styles -- */
+
+  body.menu-toggled > .meta-link > span {
+    color: rgb(30, 30, 30);
+  }
+
+  #source-link {
+    bottom: 60px;
+  }
+
+  #source-link > i {
+    color: rgb(94, 106, 210);
+  }
+
+  #yt-link > i {
+    color: rgb(239, 83, 80);
+  }
+
+  .meta-link {
+    align-items: center;
+    backdrop-filter: blur(3px);
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    bottom: 10px;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    display: inline-flex;
+    gap: 5px;
+    left: 10px;
+    padding: 10px 20px;
+    position: fixed;
+    text-decoration: none;
+    transition: background-color 400ms, border-color 400ms;
+    z-index: 10000;
+  }
+
+  .meta-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .meta-link > i,
+  .meta-link > span {
+    height: 20px;
+    line-height: 20px;
+  }
+
+  .meta-link > span {
+    color: white;
+    font-family: "Rubik", sans-serif;
+    font-weight: 500;
+  }
+</style>
+
+<style>
+  .section {
+    height: 100vh; /* Each section takes full viewport height */
+    padding: 20px;
+    box-sizing: border-box;
+    border-bottom: 2px solid #ddd;
+  }
+  .buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    /* the buttons should be arranged left right, bottom left, */
+  }
+  .year_pointer {
+    color: white;
+    font-size: 20px;
+    margin: 10px;
+    cursor: pointer;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    /* overflow: hidden; */
+    background: radial-gradient(circle at 50% 50%, #002244, #000814 80%);
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .sky {
+    position: relative;
+    height: auto;
+    width: auto;
+    overflow: hidden;
+  }
+
+  /* Base shooting star */
+  .shooting-star {
+    position: absolute;
+    width: 5px; /* Increased width for larger stars */
+    height: 5px; /* Increased height for larger stars */
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 1),
+      rgba(255, 255, 255, 0)
+    );
+    border-radius: 50%;
+    animation: shoot 3s linear infinite;
+    opacity: 0;
+  }
+
+  /* Animation for the shooting star */
+  @keyframes shoot {
+    0% {
+      transform: translate(0, 0) scale(1);
+      opacity: 1;
+    }
+    90% {
+      opacity: 0.7;
+    }
+    100% {
+      transform: translate(-800px, 600px) scale(0.5);
+      opacity: 0;
+    }
+  }
+
+  /* Randomly positioned stars */
+  .sky .shooting-star:nth-child(1) {
+    top: 10%;
+    left: 80%;
+    animation-delay: 0s;
+  }
+
+  .sky .shooting-star:nth-child(2) {
+    top: 30%;
+    left: 70%;
+    animation-delay: 1.5s;
+  }
+
+  .sky .shooting-star:nth-child(3) {
+    top: 50%;
+    left: 90%;
+    animation-delay: 2.5s;
+  }
+
+  .sky .shooting-star:nth-child(4) {
+    top: 20%;
+    left: 60%;
+    animation-delay: 3s;
+  }
+
+  .sky .shooting-star:nth-child(5) {
+    top: 40%;
+    left: 75%;
+    animation-delay: 4s;
+  }
+</style>
+<script>
+  const sky = document.querySelector(".sky");
+
+  // Create multiple shooting stars dynamically
+  for (let i = 0; i < 20; i++) {
+    const star = document.createElement("div");
+    star.classList.add("shooting-star");
+
+    // Randomize position and animation delay
+    const top = Math.random() * 100;
+    const left = Math.random() * 100;
+    const delay = Math.random() * 5;
+
+    star.style.top = `${top}%`;
+    star.style.left = `${left}%`;
+    star.style.animationDelay = `${delay}s`;
+
+    sky.appendChild(star);
+  }
+</script>
+<script>
+  function scrollToSection(sectionId, event) {
+    const section = document.getElementById(sectionId);
+    section.scrollIntoView({ behavior: "smooth" });
+  }
+</script>
+<script>
+  if ("scrollRestoration" in history) {
+    history.scrollRestoration = "manual"; // Prevent browser from restoring scroll position
+  }
+</script>
+
+<script>
+  const track = document.getElementById("2022_images");
+
+  const handleOnDown = (e) => (track.dataset.mouseDownAt = e.clientX);
+
+  const handleOnUp = () => {
+    track.dataset.mouseDownAt = "0";
+    track.dataset.prevPercentage = track.dataset.percentage;
+  };
+
+  const handleOnMove = (e) => {
+    if (track.dataset.mouseDownAt === "0") return;
+
+    const mouseDelta = parseFloat(track.dataset.mouseDownAt) - e.clientX,
+      maxDelta = window.innerWidth / 2;
+
+    const percentage = (mouseDelta / maxDelta) * -100,
+      nextPercentageUnconstrained =
+        parseFloat(track.dataset.prevPercentage) + percentage,
+      nextPercentage = Math.max(Math.min(nextPercentageUnconstrained, 0), -100);
+
+    track.dataset.percentage = nextPercentage;
+
+    track.animate(
+      {
+        transform: `translate(${nextPercentage}%, -50%)`,
+      },
+      { duration: 1200, fill: "forwards" }
+    );
+  };
+
+  /* -- Had to add extra lines for touch events -- */
+
+  window.onmousedown = (e) => handleOnDown(e);
+
+  window.ontouchstart = (e) => handleOnDown(e.touches[0]);
+
+  window.onmouseup = (e) => handleOnUp(e);
+
+  window.ontouchend = (e) => handleOnUp(e.touches[0]);
+
+  window.onmousemove = (e) => handleOnMove(e);
+
+  window.ontouchmove = (e) => handleOnMove(e.touches[0]);
+</script>

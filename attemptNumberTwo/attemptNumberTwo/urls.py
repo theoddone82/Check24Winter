@@ -24,4 +24,6 @@ urlpatterns = [
     path('__debug__/', include(debug_toolbar.urls)),
     path('admin/', admin.site.urls),
     path('', include('gameLogic.urls')),
+    path('gameLogicV2/', include('gameLogicV2.urls')),
+    path('storyTime/', include('storyTime.urls')),
 ]
