@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" style="overflow-y: auto;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}  
+</head>
+<body>
+    <div id="loading-overlay">
+        <div class="throbber"></div>
+    </div>
+    <!-- Title Section -->
+    <button id="toggleSelectedPackagesBtn" class="btn btn-primary mt-4 position-absolute start-0">Beste Kombination</button>
+
+    <!-- [Your existing body content up to the main container remains unchanged] -->
+    <main class="container" style="padding-bottom: 100px;">
+        <!-- Div to display selected packages information -->
+        <div id="selectedPackagesInfo" style="display: none;">
+            <h3 class="mt-4 text-center">Beste Kombination:</h3>
+            <div class="row">
+                {% for package in selected_packages2 %}
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ package.name }}</h5>
+                            <p class="card-text">
+                                <strong>Monthly Price:</strong>
+                                {% if package.monthly_price_cents == 0 %}
+                                <strong>Free</strong>
+                                {% else %}
+                                <strong>{{ package.monthly_price_cents_float|floatformat:2|default:"---" }} €</strong>
+                                {% endif %}
+                                <br>
+                                <strong>Yearly Price:</strong>
+                                {% if package.monthly_price_yearly_subscription_in_cents == 0 %}
+                                <strong>Free</strong>
+                                {% else %}
+                                <strong>{{ package.monthly_price_yearly_subscription_in_cents_float|floatformat:2|default:"---" }}
+                                    €</strong>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <br style="padding: 20px;">
+        {% load custom_filters %}
+        <div class="table-responsive">
+            <table class="table comparison-table table-hover align-middle text-center rounded table-responsive ">
+                <!-- Header Row with Package Names and Logos -->
+                <thead class="align-middle">
+                    <tr>
+                        <th ></th>
+                        {% for package in packages %}
+                        <th scope="col" style="min-width: 200px;" colspan="2">
+                            <i class="fab fa-amazon fa-2x"></i>
+                            <br>
+                            {{ package.name }}
+                            <br>
+                            <br>
+                            <div
+                                style="color: grey; display: flex; position: absolute; bottom: 5px; left: 10px; font-weight: normal;">
+                                live</div>
+                            <div
+                                style="color: grey; display: flex; position: absolute; bottom: 5px; right: 10px;  font-weight: normal;">
+                                highl.</div>
+
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows for Each League -->
+                    {% for league in leagues %}
+                    <tr {% if forloop.counter > 3 %}class="extra-row display_hidden_row"{% endif %}>
+                        
+                        <th scope="row">{{ league }}</th>
+                        {% for package in packages %}
+                        {% with av=availability|get_item:package.id %}
+                        {% with league_av=av|get_item:league %}
+                        <!-- Live Availability Cell -->
+                        <td>
+                            {% if league_av and league_av.live %}
+                            <span class="icon-yes"><i class="fas fa-check-circle"></i></span>
+                            {% else %}
+                            <span class="icon-no"><i class="fas fa-times-circle"></i></span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Highlights Availability Cell -->
+                        <td>
+                            {% if league_av and league_av.highlight %}
+                            <span class="icon-yes"><i class="fas fa-check-circle"></i></span>
+                            {% else %}
+                            <span class="icon-no"><i class="fas fa-times-circle"></i></span>
+                            {% endif %}
+                        </td>
+                        {% endwith %}
+                        {% endwith %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <th scope="row">Monthly Price</th>
+                        {% for package in packages %}
+                        <td colspan="2">
+                            {% if package.monthly_price_cents == 0 %}
+                            <strong>Free</strong>
+                            {% else %}
+                            <strong>{{ package.monthly_price_cents|floatformat:2|default:"---" }} €</strong>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th scope="row">Yearly Price</th>
+                        {% for package in packages %}
+                        <td colspan="2">
+                            {% if package.monthly_price_yearly_subscription_in_cents == 0 %}
+                            <strong>Free</strong>
+                            {% else %}
+                            <strong>{{ package.monthly_price_yearly_subscription_in_cents|floatformat:2|default:"---" }}
+                                €</strong>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <br style="padding: 20px;">        
+    <a class="btn btn-primary" id="toggle_table">Alle anzeigen</a>
+    </main>
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="GET" action="{% url 'selection' %}" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filter Options</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Price Filter -->
+                <div class="mb-3">
+                    <label class="form-label">Price</label>
+                    <div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="price" value="free" id="priceFree" {% if 'free' in selected_price %}checked{% endif %}>
+                            <label class="form-check-label" for="priceFree">Free</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="price" value="paid" id="pricePaid" {% if 'paid' in selected_price %}checked{% endif %}>
+                            <label class="form-check-label" for="pricePaid">Paid</label>
+                        </div>
+                    </div>
+                </div>
+                <!-- Streaming Providers Filter -->
+                <div class="mb-3">
+                    <label class="form-label">Streaming Providers</label>
+                    {% for provider in all_providers %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="providers" value="{{ provider.id }}" id="provider{{ provider.id }}" {% if provider.id|stringformat:"s" in selected_providers %}checked{% endif %}>
+                        <label class="form-check-label" for="provider{{ provider.id }}">{{ provider.name }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+                <!-- Live / Highlights Filter -->
+                <div class="mb-3">
+                    <label class="form-label">Content Type</label>
+                    <div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="content_type" value="live" id="contentLive" {% if 'live' in selected_content_types %}checked{% endif %}>
+                            <label class="form-check-label" for="contentLive">Live</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="content_type" value="highlights" id="contentHighlights" {% if 'highlights' in selected_content_types %}checked{% endif %}>
+                            <label class="form-check-label" for="contentHighlights">Highlights</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <!-- Add a Reset Button -->
+                <a href="{% url 'streaming_table' %}" class="btn btn-secondary">Reset Filters</a>
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="{% static 'js/stereaming_table.js' %}" ></script>
+
+<div class="footer-section " style="position: fixed;left:0px; bottom: 0px; z-index: 99;width: 100%;">
+    <div class="container text-center">
+        <p class="mb-0">&copy; 2024 Sendling incorportaed. This is mine i made it. <br>It was great fun and i learned a ton</p>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    window.addEventListener("load", function () {
+      // Remove the throbber once the page is fully interactive
+      document.getElementById("loading-overlay").style.display = "none";
+    });
+  </script>
+  

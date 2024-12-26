@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'import_export',
     'storyTime',
     'gameLogic',
-    'gameLogicV2',        
+    'gameLogicV2',
+    'gameLogicV3',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -59,7 +60,6 @@ INSTALLED_APPS = [
     'csvFileParser',
     'debug_toolbar',
     'livereload',
-
 ]
 
 

@@ -17,14 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls.conf import include
-from django.conf import settings
-import debug_toolbar
+from . import views
 
 urlpatterns = [
-    path('__debug__/', include(debug_toolbar.urls)),
-    path('admin/', admin.site.urls),
-    path('', include('gameLogic.urls')),
-    path('gameLogicV2/', include('gameLogicV2.urls')),
-    path('storyTime/', include('storyTime.urls')),
-    path('gameLogicV3/', include('gameLogicV3.urls')),
+    path('selection/', views.streaming_table, name='selection'),
+    path('' , views.homepage, name='homepage'),
+    path('results/', views.display_table, name='results'),
 ]
