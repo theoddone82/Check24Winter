@@ -176,7 +176,7 @@ def display_table(request):
             'selected_packages': selected_packages,
         }
         cache.set(cache_key, context, timeout=None)
-        return render(request, 'results.html', context)
+        return render(request, 'result.html', context)
     else:
         return redirect(reverse('homepage')) # in case someone trys to access the page without submitting the form
 

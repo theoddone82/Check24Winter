@@ -32,18 +32,22 @@ def generate_cache_key(selected_clubs, selected_lieges):
 def streaming_table(request):
     return render(request,'all_selection-v3.html')
 
+def homepage(request):
+    return render(request, 'homepage.html')
+
+
 def display_table(request):
     if request.method == "POST":
         selectedClubs = request.POST.getlist('clubs') 
         selectedLieges = request.POST.getlist('lieges') 
         cache_key = generate_cache_key(selectedClubs, selectedLieges)
         context = cache.get(cache_key)
-        if context:
+        if context and False:
             return render(request, 'result-v3.html', context)
         
         # Fetch liege names if any are selected
         if selectedLieges:
-            lieges_but_not_db = lieges.objects.filter(id__in=selectedLieges).values_list('name', flat=True).order_by('-score')# it's a set dumbass order doesn't matter.order_by('-score')    
+            lieges_but_not_db = lieges.objects.filter(id__in=selectedLieges).values_list('name', flat=True).order_by('-score')
         else:
             lieges_but_not_db = set()
 
@@ -54,6 +58,7 @@ def display_table(request):
             clubList = clubs.objects.all()
 
         club_names = clubList.values_list('name', flat=True)
+
         # Fetch games involving selected clubs and lieges
         games_query = Q(team_home__in=club_names) | Q(team_away__in=club_names)
         if lieges_but_not_db:
@@ -63,42 +68,41 @@ def display_table(request):
         game_ids = [game['id'] for game in games]
         tournament_names = set(game['tournament_name'] for game in games)
 
-        # Fetch streaming offers for these games
+        # Fetch streaming offers
         streaming_offers = streaming_offer.objects.filter(
             game_id__in=game_ids
         ).select_related('streaming_package_id', 'game_id')
 
         # Get unique package IDs
         unique_package_ids = streaming_offers.values_list('streaming_package_id', flat=True).distinct()
+
         # Annotate packages with calculated fields
         packages_qs = streaming_package.objects.filter(id__in=unique_package_ids).annotate(
-    monthly_price_cents_float=Case(
-        When(monthly_price_cents__isnull=True, then=Value(None)),  # If NULL, set to None
-        When(monthly_price_cents=0, then=Value(0.0)),              # If 0, set to 0.0
-        default=F('monthly_price_cents') / 100.0,                  # Otherwise, calculate float
-        output_field=FloatField()
-    ),
-    monthly_price_yearly_subscription_in_cents_float=Case(
-        When(monthly_price_yearly_subscription_in_cents__isnull=True, then=Value(None)),
-        When(monthly_price_yearly_subscription_in_cents=0, then=Value(0.0)),
-        default=F('monthly_price_yearly_subscription_in_cents') / 100.0,
-        output_field=FloatField()
-    )
-)
+            monthly_price_cents_float=Case(
+                When(monthly_price_cents__isnull=True, then=Value(None)),
+                When(monthly_price_cents=0, then=Value(0.0)),
+                default=F('monthly_price_cents') / 100.0,
+                output_field=FloatField()
+            ),
+            monthly_price_yearly_subscription_in_cents_float=Case(
+                When(monthly_price_yearly_subscription_in_cents__isnull=True, then=Value(None)),
+                When(monthly_price_yearly_subscription_in_cents=0, then=Value(0.0)),
+                default=F('monthly_price_yearly_subscription_in_cents') / 100.0,
+                output_field=FloatField()
+            )
+        )
 
-        # Build package data and mappings in a single loop
+        # Build package data and mappings
         packages = []
         package_info = {}
-
         for pak in packages_qs:
             package_data = {
                 'id': pak.id,
                 'name': pak.name,
-                'logo': 'nologo.png',
+                'logo': 'nologo.png',  # or pak.logo if you have it
                 'monthly_price_cents': pak.monthly_price_cents_float,
                 'monthly_price_yearly_subscription_in_cents': pak.monthly_price_yearly_subscription_in_cents_float,
             }
-            # Add package data to both list and dictionary for quick lookup by ID
             packages.append(package_data)
             package_info[pak.id] = package_data
 
@@ -114,6 +118,7 @@ def display_table(request):
             if tournament_name not in availability[package_id]:
                 availability[package_id][tournament_name] = {'live': False, 'highlight': False}
 
+            # OR both live/highlights
             availability[package_id][tournament_name]['live'] |= bool(off.live)
             availability[package_id][tournament_name]['highlight'] |= bool(off.highlights)
 
@@ -126,14 +131,15 @@ def display_table(request):
         for package_id, tournaments in availability.items():
             coverage = set()
             for tournament_name, data in tournaments.items():
-                if data.get('live'):
+                # Change the coverage rule if you want live OR highlights
+                if data.get('live') or data.get('highlight'):
                     coverage.add(tournament_name)
             package_coverage[package_id] = coverage
 
         # Required tournaments (leagues)
         required_tournaments = set(tournament_names)
 
-        # Implement greedy algorithm to select best budget packages
+        # Greedy algorithm for best budget coverage
         selected_packages = set()
         remaining_tournaments = set(required_tournaments)
         while remaining_tournaments:
@@ -147,38 +153,56 @@ def display_table(request):
                 new_coverage = coverage & remaining_tournaments
                 if not new_coverage:
                     continue
+
                 cost = package_info[package_id]['monthly_price_yearly_subscription_in_cents']
                 if cost is None:
-                    cost = 0  # Assume free
+                    cost = 0.0  # treat None cost as 0 or handle differently
                 if cost == 0:
-                    cost = 0.01  # Avoid division by zero
+                    cost = 0.01  # to avoid division by zero
                 cost_per_tournament = cost / len(new_coverage)
+
                 if cost_per_tournament < best_cost_per_tournament:
                     best_package = package_id
                     best_coverage = new_coverage
                     best_cost_per_tournament = cost_per_tournament
 
             if not best_package:
+                # We couldn't find any package that covers remaining tournaments
                 break
 
             selected_packages.add(best_package)
             remaining_tournaments -= best_coverage
-        
-        packages_as_objects = streaming_package.objects.filter(id__in=selected_packages).annotate(
+
+        packages_as_objects = streaming_package.objects.filter(
+            id__in=selected_packages
+        ).annotate(
             monthly_price_cents_float=Coalesce(NullIf(F('monthly_price_cents'), 0) / 100.0, Value(None)),
             monthly_price_yearly_subscription_in_cents_float=Coalesce(NullIf(F('monthly_price_yearly_subscription_in_cents'), 0) / 100.0, Value(None))
         )
+
+        # ---------------------------
+        # Add coverage status flags
+        # ---------------------------
+        all_covered = (len(remaining_tournaments) == 0)
+        any_covered = len(selected_packages) > 0
+
+        if all_covered:
+            partial_coverage = False
+        elif any_covered:
+            partial_coverage = True  # some coverage but not all
+        else:
+            partial_coverage = False  # no coverage at all
+
         context = {
             'packages': packages,
             'leagues': lieges_but_not_db,
             'availability': availability,
             'selected_packages2': packages_as_objects,
             'selected_packages': selected_packages,
+            'all_covered': all_covered,
+            'partial_coverage': partial_coverage,
         }
         cache.set(cache_key, context, timeout=None)
-        return render(request, 'results-v3.html', context)
+        return render(request, 'result-v3.html', context)
     else:
-        return redirect(reverse('homepage')) # in case someone trys to access the page without submitting the form
-
-def homepage(request):
-    return render(request, 'homepage.html')
+        return redirect(reverse('homepage'))
