@@ -11,7 +11,7 @@ class streaming_package(models.Model):
     name = models.CharField(max_length=100)
     monthly_price_cents = models.IntegerField(null=True)
     monthly_price_yearly_subscription_in_cents = models.IntegerField(null=True)
-
+    annual_only = models.BooleanField(null=True, default=False)
 
 class streaming_offer(models.Model):
     game_id = models.ForeignKey(game, on_delete=models.CASCADE)
@@ -31,17 +31,3 @@ class lieges(models.Model):
     score = models.IntegerField(null=True)
     def __str__(self):
         return self.name  # This will be displayed in the ModelChoiceField
-    
-class db_cache(models.Model):
-    key = models.CharField(max_length=10000)
-    value = models.CharField(max_length=10000)
-    def __str__(self):
-        return self.key  # This will be displayed in the ModelChoiceField
-    
-class BestStreamingProvider(models.Model):
-    club = models.ForeignKey(clubs, on_delete=models.CASCADE)
-    streaming_package = models.ForeignKey(streaming_package, on_delete=models.CASCADE)
-    is_best_provider = models.BooleanField(default=True)
-
-    def __str__(self):
-        return f"{self.club.name} - {self.streaming_package.name}"

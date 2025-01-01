@@ -27,4 +27,5 @@ urlpatterns = [
     path('gameLogicV2/', include('gameLogicV2.urls')),
     path('storyTime/', include('storyTime.urls')),
     path('gameLogicV3/', include('gameLogicV3.urls')),
+    path('gameLogicFinal/', include('gameLogicFinal.urls')),
 ]

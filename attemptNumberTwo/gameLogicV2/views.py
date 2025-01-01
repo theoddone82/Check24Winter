@@ -88,54 +88,35 @@ def display_table(request):
 
         # Build package data and mappings in a single loop
         packages = []
+        # Step 1. Build a dictionary for cost (in float).
         package_info = {}
-
         for pak in packages_qs:
+            # Convert from cents to float
+            monthly_price = float(pak.monthly_price_cents_float or 0.0)
+            yearly_price  = float(pak.monthly_price_yearly_subscription_in_cents_float or 0.0)
+
+            # Decide how to pick cost
+            if yearly_price > 0:
+                cost = yearly_price
+            elif monthly_price > 0:
+                cost = monthly_price
+            else:
+                cost = 0.0  # truly free or missing data
+
             package_data = {
                 'id': pak.id,
                 'name': pak.name,
                 'logo': 'nologo.png',
-                'monthly_price_cents': pak.monthly_price_cents_float,
-                'monthly_price_yearly_subscription_in_cents': pak.monthly_price_yearly_subscription_in_cents_float,
+                'monthly_price_cents': monthly_price,
+                'monthly_price_yearly_subscription_in_cents': yearly_price,
+                'effective_cost': cost,
             }
-            # Add package data to both list and dictionary for quick lookup by ID
-            packages.append(package_data)
             package_info[pak.id] = package_data
 
-        # Build availability dictionary
-        availability = {}
-        for off in streaming_offers:
-            package_id = off.streaming_package_id.id
-            tournament_name = off.game_id.tournament_name
-
-            if package_id not in availability:
-                availability[package_id] = {}
-
-            if tournament_name not in availability[package_id]:
-                availability[package_id][tournament_name] = {'live': False, 'highlight': False}
-
-            availability[package_id][tournament_name]['live'] |= bool(off.live)
-            availability[package_id][tournament_name]['highlight'] |= bool(off.highlights)
-
-        # If no lieges were selected, use the tournaments from the games
-        if not lieges_but_not_db:
-            lieges_but_not_db = tournament_names
-
-        # Build package coverage mapping
-        package_coverage = {}
-        for package_id, tournaments in availability.items():
-            coverage = set()
-            for tournament_name, data in tournaments.items():
-                if data.get('live'):
-                    coverage.add(tournament_name)
-            package_coverage[package_id] = coverage
-
-        # Required tournaments (leagues)
-        required_tournaments = set(tournament_names)
-
-        # Implement greedy algorithm to select best budget packages
+        # Step 2. Greedy coverage
         selected_packages = set()
         remaining_tournaments = set(required_tournaments)
+
         while remaining_tournaments:
             best_package = None
             best_coverage = set()
@@ -144,25 +125,31 @@ def display_table(request):
             for package_id, coverage in package_coverage.items():
                 if package_id in selected_packages:
                     continue
+
                 new_coverage = coverage & remaining_tournaments
                 if not new_coverage:
-                    continue
-                cost = package_info[package_id]['monthly_price_yearly_subscription_in_cents']
-                if cost is None:
-                    cost = 0  # Assume free
+                    continue  # no additional coverage
+
+                # get cost from the new dictionary
+                cost = package_info[package_id]['effective_cost'] or 0.0
+                # if truly zero cost, we can leave it at zero or do 0.01, depending on logic
                 if cost == 0:
-                    cost = 0.01  # Avoid division by zero
-                cost_per_tournament = cost / len(new_coverage)
+                    cost = 0.0
+
+                cost_per_tournament = cost / len(new_coverage) if new_coverage else float('inf')
+
                 if cost_per_tournament < best_cost_per_tournament:
                     best_package = package_id
                     best_coverage = new_coverage
                     best_cost_per_tournament = cost_per_tournament
 
             if not best_package:
+                # no package can help cover remaining tournaments
                 break
 
             selected_packages.add(best_package)
             remaining_tournaments -= best_coverage
+
         
         packages_as_objects = streaming_package.objects.filter(id__in=selected_packages).annotate(
             monthly_price_cents_float=Coalesce(NullIf(F('monthly_price_cents'), 0) / 100.0, Value(None)),
