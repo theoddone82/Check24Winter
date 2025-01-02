@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     'gameLogic',
     'gameLogicV2',
     'gameLogicV3',
-    'gameLogicFinal',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
