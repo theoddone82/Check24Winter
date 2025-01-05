@@ -33,24 +33,9 @@ def generate_cache_key(selected_clubs, selected_lieges):
 def streaming_table(request):
     return render(request,'all_selection-v3.html')
 
-
-from django.shortcuts import render, redirect
-from django.db.models import Q, F, Value, FloatField, Case, When
-from django.db.models.functions import Coalesce, NullIf
-from django.urls import reverse
-from django.core.cache import cache
-from collections import defaultdict
-
 def homepage(request):
     return render(request, 'homepage.html')
 
-from django.shortcuts import render, redirect
-from django.db.models import Q, F, Value, FloatField, Case, When
-from django.db.models.functions import Coalesce, NullIf
-from django.urls import reverse
-from django.core.cache import cache
-from collections import defaultdict
-from datetime import datetime
 
 def homepage(request):
     return render(request, 'homepage.html')
