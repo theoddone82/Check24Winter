@@ -40,7 +40,7 @@ def homepage(request):
 def homepage(request):
     return render(request, 'homepage.html')
 
-def display_table(request):
+def dt(request):
     if request.method != "POST":
         return redirect(reverse('homepage'))
     
@@ -317,7 +317,7 @@ def display_table(request):
             # no improvement
             break
 
-        selected_packages.add(best_package)
+        selected_packages.add(best_package) # list of bast package id's 
         uncovered_game_ids -= package_coverage_by_game[best_package]
 
     # ------------------------------------------------------------
@@ -351,7 +351,330 @@ def display_table(request):
         'packages': packages,
         'leagues': selected_lieges_names,
         'availability': availability,
-        'selected_packages2': selected_packages_qs,
+        'selected_packages': selected_packages_qs,
+    }
+    cache.set(cache_key, context, timeout=None)
+
+    return render(request, 'result-v3.html', context)
+
+def display_table(request):
+    if request.method != "POST":
+        return redirect(reverse('homepage'))
+    
+    # 1. Retrieve selected clubs and lieges from the POST data
+    selected_clubs = request.POST.getlist('clubs')
+    selected_lieges = request.POST.getlist('lieges')
+    
+    # 2. Cache logic
+    cache_key = generate_cache_key(selected_clubs, selected_lieges)
+    context = cache.get(cache_key)
+    if context and False:  # For demo, skip the cache
+        return render(request, 'result-v3.html', context)
+
+    # 3. Gather league names and clubs
+    if selected_lieges:
+        selected_lieges_names = list(
+            lieges.objects.filter(id__in=selected_lieges)
+                          .order_by('-score')
+                          .values_list('name', flat=True)
+        )
+    else:
+        selected_lieges_names = []
+
+    if selected_clubs:
+        club_qs = clubs.objects.filter(id__in=selected_clubs)
+    else:
+        club_qs = clubs.objects.all()
+    club_names = list(club_qs.values_list('name', flat=True))
+
+    # 4. Build a union (OR) query for games
+    games_query = Q()
+    
+    if club_names:
+        club_query = Q(team_home__in=club_names) | Q(team_away__in=club_names)
+        games_query |= club_query
+
+    if selected_lieges_names:
+        liege_query = Q(tournament_name__in=selected_lieges_names)
+        games_query |= liege_query
+
+    # If user selected nothing, fetch all games or none
+    if not club_names and not selected_lieges_names:
+        games_query = Q()  # means fetch all
+
+    games_qs = game.objects.filter(games_query).values('id', 'tournament_name', 'starts_at')
+    games = list(games_qs)
+    if not games:
+        # No relevant games => return empty context
+        return render(request, 'result-v3.html', {
+            'packages': [],
+            'leagues': [],
+            'availability': {},
+            'selected_packages2': [],
+            'selected_packages': set()
+        })
+
+    # We'll need these for coverage
+    game_ids = [g['id'] for g in games]
+    tournament_names = {g['tournament_name'] for g in games}
+
+    # 5. Determine date range and needed_months
+    dates = [g['starts_at'] for g in games]
+    earliest_date = min(dates)
+    latest_date = max(dates)
+
+    def month_diff(d1, d2):
+        """Number of months between d1 and d2, inclusive."""
+        return ((d2.year - d1.year) * 12 + (d2.month - d1.month)) + 1
+
+    needed_months = month_diff(earliest_date, latest_date)
+    if needed_months < 1:
+        needed_months = 1
+
+    # 6. Fetch streaming offers and packages
+    streaming_offers = (
+        streaming_offer.objects
+        .filter(game_id__in=game_ids)
+        .select_related('streaming_package_id', 'game_id')
+    )
+    unique_package_ids = (
+        streaming_offers
+        .values_list('streaming_package_id', flat=True)
+        .distinct()
+    )
+
+    packages_qs = (
+        streaming_package.objects
+        .filter(id__in=unique_package_ids)
+        .annotate(
+            monthly_price_cents_float=Case(
+                When(monthly_price_cents__isnull=True, then=Value(None)),
+                When(monthly_price_cents=0, then=Value(0.0)),
+                default=F('monthly_price_cents') / 100.0,
+                output_field=FloatField()
+            ),
+            monthly_price_yearly_subscription_in_cents_float=Case(
+                When(monthly_price_yearly_subscription_in_cents__isnull=True, then=Value(None)),
+                When(monthly_price_yearly_subscription_in_cents=0, then=Value(0.0)),
+                default=F('monthly_price_yearly_subscription_in_cents') / 100.0,
+                output_field=FloatField()
+            )
+        )
+    )
+
+    # Build a dictionary of packages (for quick cost lookups, etc.)
+    package_info = {}
+    for pak in packages_qs:
+        package_info[pak.id] = {
+            'id': pak.id,
+            'name': pak.name,
+            'annual_only': getattr(pak, 'annual_only', False),
+            'monthly_price_eur': getattr(pak, 'monthly_price_cents_float', 0.0),
+            'yearly_price_eur': getattr(pak, 'monthly_price_yearly_subscription_in_cents_float', 0.0),
+        }
+
+    def compute_partial_cost(pkg_id):
+        """
+        Return minimal cost of a package for the needed_months window.
+        Respects annual_only. 
+        """
+        pkg = package_info[pkg_id]
+        monthly = pkg['monthly_price_eur'] or 0.0
+        yearly = pkg['yearly_price_eur'] or 0.0
+        if pkg['annual_only']:
+            return yearly if yearly > 0 else 0.01
+        # Otherwise pick cheaper of paying monthly vs. the yearly subscription
+        monthly_cost = (monthly if monthly > 0 else 0.01) * needed_months
+        yearly_cost = yearly if yearly > 0 else 0.01
+        return min(monthly_cost, yearly_cost)
+
+    # 7. Coverage logic:
+    #
+    #    Instead of simply “covered if live OR highlight,” 
+    #    we’ll define a small numeric coverage:
+    #       - 1.0 point if live
+    #       - 0.5 point if only highlights
+    #
+    #    For each package and each game, store how much coverage 
+    #    the package can provide.
+    #
+    #    Then we’ll do a “greedy fractional coverage” approach: 
+    #    each game starts with coverage_need=1.0. 
+    #    If the package has live => it covers 1.0, 
+    #    if only highlights => it covers 0.5 
+    #    (or partial if the game still needs some fraction).
+    #
+    #    For simplicity, if the package has both live & highlights, 
+    #    treat it as live=1.0 (full coverage).
+    #
+    from collections import defaultdict
+
+    coverage_of_game = defaultdict(dict)
+    for off in streaming_offers:
+        pkg_id = off.streaming_package_id.id
+        g_id = off.game_id.id
+
+        # We treat "live" coverage as 1.0, else if only highlight => 0.5
+        # If a single offer is live=True and highlight=True, that’s still 1.0 coverage
+        # If an offer is just highlight=True, coverage is 0.5
+        # If multiple lines exist for same pkg-game, we’ll keep the max coverage
+        coverage_points = 0.0
+        if off.live:
+            coverage_points = 1.0
+        elif off.highlights:
+            coverage_points = 0.5
+
+        # If multiple streaming_offers rows exist for the same package/game
+        # we take the max coverage
+        coverage_of_game[pkg_id][g_id] = max(
+            coverage_of_game[pkg_id].get(g_id, 0.0), 
+            coverage_points
+        )
+
+    # Build a list/dict to track how much coverage each game STILL needs
+    coverage_need = {}
+    for g in games:
+        coverage_need[g['id']] = 1.0  # each game wants full coverage (value=1.0)
+
+    selected_packages = set()
+    # Because we’re doing a greedy approach, we keep iterating until 
+    # coverage_need for all games is ~0 or we can’t improve coverage
+    while True:
+        best_pkg = None
+        best_ratio = 0.0
+        best_coverage_gain = 0.0
+
+        for pkg_id in unique_package_ids:
+            if pkg_id in selected_packages:
+                continue
+
+            # How much coverage can this package still provide 
+            # for the uncovered portion of each game?
+            # E.g. if a game needs 1.0 coverage, but the package can only do 0.5, 
+            # that is 0.5 coverage gained for that game.
+            incremental_coverage = 0.0
+            for g_id, need_left in coverage_need.items():
+                if need_left > 0:  # game not fully covered
+                    # coverage potential from this package for that game
+                    pkg_covers = coverage_of_game[pkg_id].get(g_id, 0.0)
+                    # We can only use min(pkg_covers, need_left)
+                    # e.g. if need_left=1.0 but pkg_covers=0.5 => 0.5 coverage gained
+                    # or if we still need 0.5 but pkg can do 1 => 0.5 coverage used
+                    coverage_gain_for_game = min(pkg_covers, need_left)
+                    incremental_coverage += coverage_gain_for_game
+
+            if incremental_coverage > 0:
+                cost = compute_partial_cost(pkg_id)
+                ratio = incremental_coverage / cost if cost else float('inf')
+                if ratio > best_ratio:
+                    best_ratio = ratio
+                    best_pkg = pkg_id
+                    best_coverage_gain = incremental_coverage
+
+        if not best_pkg:
+            # No package improves coverage further => break
+            break
+
+        # Select that package
+        selected_packages.add(best_pkg)
+        # Reduce coverage_need for each game
+        for g_id, need_left in coverage_need.items():
+            if need_left > 0:
+                pkg_covers = coverage_of_game[best_pkg].get(g_id, 0.0)
+                coverage_need[g_id] = max(0.0, need_left - pkg_covers)
+
+        # If all coverage_need is 0 => done
+        if all(needed <= 0 for needed in coverage_need.values()):
+            break
+
+    # Build final QS for the selected packages
+    selected_packages_qs = (
+        streaming_package.objects
+        .filter(id__in=selected_packages)
+        .annotate(
+            monthly_price_cents_float=Coalesce(
+                NullIf(F('monthly_price_cents'), 0) / 100.0, 
+                Value(None)
+            ),
+            monthly_price_yearly_subscription_in_cents_float=Coalesce(
+                NullIf(F('monthly_price_yearly_subscription_in_cents'), 0) / 100.0, 
+                Value(None)
+            )
+        )
+    )
+
+    # Build the availability dictionary exactly as you did before,
+    # or adapt it to account for partial coverage. For brevity,
+    # we’ll reuse your code for availability:
+    tournament_to_game_ids = defaultdict(set)
+    for g in games:
+        tournament_to_game_ids[g['tournament_name']].add(g['id'])
+
+    package_coverage_live = defaultdict(set)
+    package_coverage_highlight = defaultdict(set)
+    for off in streaming_offers:
+        p_id = off.streaming_package_id.id
+        gid = off.game_id.id
+        if off.live:
+            package_coverage_live[p_id].add(gid)
+        if off.highlights:
+            package_coverage_highlight[p_id].add(gid)
+
+    availability = {}
+    for pkg_id in unique_package_ids:
+        availability[pkg_id] = {}
+        for t_name, t_game_ids in tournament_to_game_ids.items():
+            total_count = len(t_game_ids)
+            if total_count == 0:
+                availability[pkg_id][t_name] = {
+                    'live': False,
+                    'live_partial': False,
+                    'highlight': False,
+                    'highlight_partial': False
+                }
+                continue
+
+            live_count = len(package_coverage_live[pkg_id] & t_game_ids)
+            live_ratio = live_count / total_count
+            if live_ratio == 1.0:
+                live_val = True
+                live_partial = False
+            elif live_ratio == 0.0:
+                live_val = False
+                live_partial = False
+            else:
+                live_val = False
+                live_partial = True
+
+            hi_count = len(package_coverage_highlight[pkg_id] & t_game_ids)
+            hi_ratio = hi_count / total_count
+            if hi_ratio == 1.0:
+                hi_val = True
+                hi_partial = False
+            elif hi_ratio == 0.0:
+                hi_val = False
+                hi_partial = False
+            else:
+                hi_val = False
+                hi_partial = True
+
+            availability[pkg_id][t_name] = {
+                'live': live_val,
+                'live_partial': live_partial,
+                'highlight': hi_val,
+                'highlight_partial': hi_partial
+            }
+
+    # If no lieges selected, show all tournaments
+    if not selected_lieges_names:
+        selected_lieges_names = list(tournament_names)
+
+    # Build final context
+    context = {
+        'packages': list(packages_qs),  # or a serialized version
+        'leagues': selected_lieges_names,
+        'availability': availability,
+        'selected_packages': selected_packages_qs,
     }
     cache.set(cache_key, context, timeout=None)
 
